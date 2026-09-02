@@ -1,0 +1,9 @@
+[
+  {"id":"cbeam-medium","name":"Medium C-Beam plate · 77.5×77.5 mm","mass":0.083,"my":5.338,"mz":4.341,"wheel":"Mini V-wheel","wheelCount":4,"wheelStatic":35.59},
+  {"id":"cbeam-large","name":"Large C-Beam plate · 75×155 mm","mass":0.175,"my":12.233,"mz":9.949,"wheel":"Mini V-wheel","wheelCount":4,"wheelStatic":35.59},
+  {"id":"cbeam-xl","name":"Extra-large C-Beam plate · 125×125 mm","mass":0.232,"my":36.396,"mz":7.729,"wheel":"Regular V-wheel","wheelCount":4,"wheelStatic":144.71},
+  {"id":"vslot-xs","name":"Extra-small V-Slot plate · 50×50 mm","mass":0.036,"my":2.669,"mz":2.171,"wheel":"Mini V-wheel","wheelCount":4,"wheelStatic":35.59},
+  {"id":"vslot-small","name":"Small V-Slot plate · 65×65 mm","mass":0.029,"my":14.471,"mz":2.894,"wheel":"Regular V-wheel","wheelCount":4,"wheelStatic":144.71},
+  {"id":"vslot-medium","name":"Medium V-Slot plate · 100×88 mm","mass":0.058,"my":21.939,"mz":4.388,"wheel":"Regular V-wheel","wheelCount":4,"wheelStatic":144.71},
+  {"id":"vslot-large","name":"Large V-Slot plate · 127×88 mm","mass":0.073,"my":21.939,"mz":4.388,"wheel":"Regular V-wheel","wheelCount":4,"wheelStatic":144.71}
+]
