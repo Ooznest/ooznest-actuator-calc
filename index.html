@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Linear actuator calculator</title>
+  <style>
+    :root { --primary:#1976d2; --ink:#2f373c; --muted:rgba(0,0,0,.6); --line:#e0e0e0; --soft:#fafafa; --good:#388e3c; --warn:#f57c00; --bad:#d32f2f; }
+    * { box-sizing:border-box } body { margin:0; font:14px/1.5 Roboto,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
+    main { max-width:1180px; margin:0 auto; padding:12px; } h1 { margin:0; color:var(--ink); font-size:24px; line-height:36px; font-weight:500; } h2 { color:var(--ink); font-size:20px; line-height:30px; font-weight:500; margin:16px 0 8px; } h3 { color:var(--ink); font-size:14px; font-weight:500; margin:0 0 6px; } p { margin:5px 0; }
+    .intro { color:var(--muted); font-size:13px; } .grid { display:grid; grid-template-columns:1fr; gap:0; margin-top:4px; }
+    .panel { border:0; border-top:1px solid var(--line); border-radius:0; padding:0 0 12px; } #resultPanel { order:1; grid-column:1/-1; } #capabilitiesCard { order:2; } #profileCard { order:3; } #form { order:4; grid-column:1/-1; } .inputs { display:grid; grid-template-columns:repeat(3,1fr); gap:10px 12px; }
+    label { display:block; font-size:11px; font-weight:500; letter-spacing:.02em; text-transform:uppercase; color:rgba(0,0,0,.6); } input,select { margin-top:3px; width:100%; height:34px; border:1px solid #bdbdbd; border-radius:0; padding:6px 8px; font:14px Roboto,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
+    input:focus,select:focus { outline:2px solid rgba(25,118,210,.3); border-color:var(--primary); } .full { grid-column:1/-1; } .hint { font-size:11px; line-height:1.35; color:var(--muted); margin-top:3px; } .results { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--line); }
+    .metric { background:#fff; padding:8px; border-left:1px solid var(--line); min-height:64px; } .metric:first-child { border-left:0; } .metric span { display:block; color:var(--muted); font-size:10px; } .metric strong { display:block; color:var(--ink); font-size:17px; font-weight:500; margin-top:3px; }
+    .validations { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:0 0 10px; border:1px solid var(--line); } .validation { border:0; border-left:1px solid var(--line); border-radius:0; padding:7px 8px; min-height:65px; } .validation:first-child { border-left:0; } .validation span { display:block; color:var(--muted); font-size:10px; } .validation strong { display:block; margin-top:2px; font-size:14px; font-weight:500; } .validation small { display:block; margin-top:2px; font-size:10px; line-height:1.2; color:var(--muted); } .validation.pass { border-bottom:3px solid var(--good); } .validation.fail { border-bottom:3px solid var(--bad); background:#fffafa; }
+    .status { margin:8px 0; border-radius:0; border-left:3px solid var(--primary); padding:7px 10px; font-size:13px; font-weight:500; } .good { background:#f5f5f5; color:var(--ink); } .warn { background:#fff8e1; color:#6d4c00; } .bad { background:#ffebee; color:#b71c1c; }
+    .detail { margin-top:10px; border-top:1px solid var(--line); padding-top:8px; color:var(--muted); font-size:11px; } .detail dl { display:grid; grid-template-columns:1fr auto; gap:3px 12px; margin:5px 0 0; } .detail dd { margin:0; font-weight:500; color:var(--ink); }
+    .chart { grid-column:1/-1; } .chartbox { height:185px; background:#fff; border:1px solid var(--line); padding:8px; } .capability-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } svg { width:100%; height:100%; overflow:visible; } .legend { display:flex; gap:12px; font-size:11px; color:var(--muted); flex-wrap:wrap; } .key { width:10px; height:10px; display:inline-block; margin-right:4px; background:var(--primary); } .key.gray { background:#757575; } .key.dashed { background:linear-gradient(90deg,#757575 55%,transparent 55%); } .key.red { background:#b42318; }
+    .notice { margin-top:12px; border-left:3px solid var(--primary); background:#f5f5f5; padding:9px 12px; font-size:11px; } code { background:#f5f5f5; padding:2px 4px; } @media(max-width:800px){ main{max-width:760px;padding:10px}.results,.validations{grid-template-columns:1fr 1fr}.inputs,.capability-charts{grid-template-columns:1fr}.full{grid-column:auto} } @media(min-width:801px){ .capability-charts .chartbox{height:170px} }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Linear actuator calculator</h1>
+  <p class="intro">First-pass actuator selection using a 24 V current driver. Choose the drive system and motor independently. The 345 oz-in / 8 mm screw curve is anchored to the OpenBuilds test; other motor and belt curves are intentionally derated estimates.</p>
+  <section class="grid">
+    <form class="panel" id="form">
+      <h2>Configuration</h2>
+      <div class="inputs">
+        <label class="full">Drive system<select id="actuator"></select><span class="hint" id="actuatorHint"></span></label>
+        <label>Travel (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label>
+        <label>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label>
+        <label>Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option><option value="angle">Inclined</option></select></label>
+        <label id="angleWrap">Incline from horizontal (°)<input id="angle" type="number" min="0" max="90" value="45"></label>
+        <label>Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label>
+        <label>Extra moving parts (kg)<input id="components" type="number" min="0" max="50" step="0.05" value="0.50"></label>
+        <label class="full">Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label>
+        <label>Payload centre offset (mm)<input id="offset" type="number" min="0" max="1000" step="1" value="0"></label>
+        <label>Requested speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label>
+        <label>Acceleration (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label>
+        <label>Microstepping<input id="microsteps" type="number" min="1" max="32" step="1" value="16"></label>
+        <label>Driver current (A)<input id="current" type="number" min="0.1" max="1.4" step="0.1" value="1.4"></label>
+        <label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label>
+      </div>
+      <p class="hint">Assumes a 24 V TB67S109-class constant-current driver at 1.4 A and 16× microstepping. Firmware settings are not treated as hard limits; the checks assess motor and mechanical capability at your requested motion.</p>
+    </form>
+    <section class="panel" id="resultPanel">
+      <h2>Result at your requested load and speed</h2>
+      <div id="status" class="status"></div>
+      <div class="validations">
+        <div class="validation" id="checkSpeed"><span>Speed capability</span><strong>—</strong><small>—</small></div>
+        <div class="validation" id="checkTorque"><span>Motor torque</span><strong>—</strong><small>—</small></div>
+        <div class="validation" id="checkMoment"><span>Moment load</span><strong>—</strong><small>—</small></div>
+        <div class="validation" id="checkWheels"><span>Wheels / plate</span><strong>—</strong><small>—</small></div>
+      </div>
+      <div class="results">
+        <div class="metric"><span>Drive force before safety factor</span><strong id="rawDriveForce">—</strong></div>
+        <div class="metric"><span>Design drive force</span><strong id="driveForce">—</strong></div>
+        <div class="metric"><span>Required force</span><strong id="requiredForce">—</strong></div>
+        <div class="metric"><span>Force margin</span><strong id="margin">—</strong></div>
+        <div class="metric"><span>Max load at speed</span><strong id="maxLoad">—</strong></div>
+        <div class="metric"><span>Max speed at load</span><strong id="maxSpeed">—</strong></div>
+        <div class="metric"><span>Suggested max accel</span><strong id="maxAccel">—</strong></div>
+        <div class="metric"><span>Gantry moment</span><strong id="moment">—</strong></div>
+      </div>
+      <div class="detail"><strong>What is limiting it?</strong><div id="limiter"></div><dl id="details"></dl></div>
+    </section>
+    <section class="panel chart" id="capabilitiesCard">
+      <h2>Motion and force capability</h2>
+      <div class="capability-charts">
+        <div><h3>Speed over travel</h3><div class="legend"><span><i class="key"></i>Requested profile</span></div><div class="chartbox"><svg id="profile" role="img" aria-label="Speed profile over travel"></svg></div><p class="hint" id="profileNote"></p></div>
+        <div><h3>Maximum payload at speed</h3><div class="legend"><span><i class="key"></i>Maximum payload</span><span><i class="key red"></i>Requested payload</span></div><div class="chartbox"><svg id="loadCurve" role="img" aria-label="Payload capacity over speed"></svg></div></div>
+      </div>
+      <p class="hint">Blue is maximum payload with the selected safety factor. The red line is the requested payload; its intersection with blue is the design stall point.</p>
+    </section>
+  </section>
+  <aside class="notice"><strong>Important:</strong> An 8 mm lead screw can back-drive: this tool does not treat it as a load-holding safety device. Holding torque is not running torque. The model includes a conservative electrical/dynamic allowance, but is a selection aid—not a rated load or safety certification. Use a brake, counterbalance or separate restraint wherever gravity loads must be retained on power loss.</aside>
+  <p class="hint">Iframe parameters: <code>?actuator=cbeam-screw&amp;travel=500&amp;motor=nema23-345-300&amp;orientation=vertical&amp;load=10&amp;speed=1200&amp;fos=2</code></p>
+</main>
+<script>
+(() => {
+  const motors = [
+    {id:'nema14-25-100', name:'NEMA14 · 25 oz-in · 1.0 A', torque:1.8, current:1, resistance:2.7, inductance:4, voltage:2.7, steps:200},
+    {id:'nema14-52-168', name:'NEMA14 · 52 oz-in · 1.68 A', torque:3.7, current:1.68, resistance:1.65, inductance:2.3, voltage:2.772, steps:200},
+    {id:'nema14-57-150', name:'NEMA14 · 57 oz-in · 1.5 A', torque:4.1, current:1.5, resistance:2.8, inductance:3.8, voltage:4.2, steps:200},
+    {id:'nema17-21-140', name:'NEMA17 · 21 oz-in · 1.4 A', torque:1.5, current:1.4, resistance:1.9, inductance:2, voltage:2.66, steps:200},
+    {id:'nema17-35-133-09', name:'NEMA17 · 35 oz-in · 1.33 A · 0.9°', torque:2.5, current:1.33, resistance:2.1, inductance:2.5, voltage:2.793, steps:400},
+    {id:'nema17-44-133', name:'NEMA17 · 44 oz-in · 1.33 A', torque:3.2, current:1.33, resistance:2.1, inductance:2.5, voltage:2.793, steps:200},
+    {id:'nema17-50-168-09', name:'NEMA17 · 50 oz-in · 1.68 A · 0.9°', torque:3.5, current:1.68, resistance:1.65, inductance:3.5, voltage:2.772, steps:400},
+    {id:'nema17-62-168-09', name:'NEMA17 · 61.5 oz-in · 1.68 A · 0.9°', torque:4.4, current:1.68, resistance:1.65, inductance:2.8, voltage:2.772, steps:400},
+    {id:'nema17-62-168', name:'NEMA17 · 62 oz-in · 1.68 A', torque:4.4, current:1.68, resistance:1.65, inductance:3.6, voltage:2.772, steps:200},
+    {id:'nema17-77-168', name:'NEMA17 · 77 oz-in · 1.68 A', torque:5.5, current:1.68, resistance:1.65, inductance:2.8, voltage:2.772, steps:200},
+    {id:'nema17-114-200', name:'NEMA17 · 114 oz-in · 2.0 A', torque:8.2, current:2, resistance:2, inductance:3.3, voltage:4, steps:200},
+    {id:'nema23-175-200', name:'NEMA23 · 175 oz-in · 2.0 A', torque:12.6, current:2, resistance:1.4, inductance:5.1, voltage:2.8, steps:200},
+    {id:'nema23-175-280', name:'NEMA23 · 175 oz-in · 2.8 A', torque:12.6, current:2.8, resistance:1.1, inductance:3, voltage:3.08, steps:200},
+    {id:'nema23-265-280', name:'NEMA23 · 265 oz-in · 2.8 A', torque:19.1, current:2.8, resistance:1.13, inductance:7.6, voltage:3.164, steps:200},
+    {id:'nema23-345-300', name:'NEMA23 · 345 oz-in · 3.0 A', torque:24.5, current:3, resistance:1.2, inductance:4, voltage:3.6, steps:200}
+  ];
+  const actuators = [
+    {id:'cbeam-screw', name:'C-Beam TR8×8 lead-screw drive', type:'screw', lead:8, efficiency:.42, maxTravel:1000, friction:.05, note:'8 mm/rev screw; 250–1,000 mm listed kit range. Back-drive possible.'},
+    {id:'nema23-screw', name:'TR8×8 lead-screw drive', type:'screw', lead:8, efficiency:.42, maxTravel:1500, friction:.05, note:'8 mm/rev screw model. Validate screw whip and back-drive for final length.'},
+    {id:'nema17-screw', name:'Compact TR8×8 lead-screw drive', type:'screw', lead:8, efficiency:.38, maxTravel:1000, friction:.05, note:'8 mm/rev screw model. Validate physical motor-mount compatibility.'},
+    {id:'belt-gt2-30t', name:'Belt actuator · GT2 / 30 tooth pulley', type:'belt', lead:60, efficiency:.95, maxTravel:2000, friction:.035, note:'60 mm/rev theoretical belt travel; belt tension and plate stiffness must be verified.'},
+    {id:'belt-gt3-20t', name:'Belt actuator · GT3 / 20 tooth pulley', type:'belt', lead:60, efficiency:.95, maxTravel:2000, friction:.035, note:'60 mm/rev theoretical belt travel; belt tension and plate stiffness must be verified.'}
+  ];
+  const gantries = [
+    {id:'cbeam-medium', name:'Medium C-Beam plate · 77.5×77.5 mm', mass:.083, my:5.338, mz:4.341, wheel:'Mini V-wheel', wheelCount:4, wheelStatic:35.59},
+    {id:'cbeam-large', name:'Large C-Beam plate · 75×155 mm', mass:.175, my:12.233, mz:9.949, wheel:'Mini V-wheel', wheelCount:4, wheelStatic:35.59},
+    {id:'cbeam-xl', name:'Extra-large C-Beam plate · 125×125 mm', mass:.232, my:36.396, mz:7.729, wheel:'Regular V-wheel', wheelCount:4, wheelStatic:144.71},
+    {id:'vslot-xs', name:'Extra-small V-Slot plate · 50×50 mm', mass:.036, my:2.669, mz:2.171, wheel:'Mini V-wheel', wheelCount:4, wheelStatic:35.59},
+    {id:'vslot-small', name:'Small V-Slot plate · 65×65 mm', mass:.029, my:14.471, mz:2.894, wheel:'Regular V-wheel', wheelCount:4, wheelStatic:144.71},
+    {id:'vslot-medium', name:'Medium V-Slot plate · 100×88 mm', mass:.058, my:21.939, mz:4.388, wheel:'Regular V-wheel', wheelCount:4, wheelStatic:144.71},
+    {id:'vslot-large', name:'Large V-Slot plate · 127×88 mm', mass:.073, my:21.939, mz:4.388, wheel:'Regular V-wheel', wheelCount:4, wheelStatic:144.71}
+  ];
+  const $ = id => document.getElementById(id);
+  const numeric = id => Math.max(0, Number($(id).value) || 0);
+  const params = new URLSearchParams(location.search);
+  const populate = (id, items) => $(id).innerHTML = items.map(x => `<option value="${x.id}">${x.name}</option>`).join('');
+  populate('motor', motors); populate('actuator', actuators); populate('gantry', gantries);
+  ['actuator','motor','gantry','travel','orientation','angle','load','components','offset','speed','accel','microsteps','current','fos'].forEach(k => { if(params.has(k)) $(k).value = params.get(k); });
+  if(!params.has('motor')) $('motor').value='nema23-345-300';
+  if(!params.has('gantry')) $('gantry').value='cbeam-large';
+  const fmt = (n, d=0) => Number.isFinite(n) ? n.toLocaleString(undefined,{maximumFractionDigits:d}) : '—';
+  function validation(id, pass, title, detail) { const el=$(id); el.className=`validation ${pass?'pass':'fail'}`; el.querySelector('strong').textContent=title; el.querySelector('small').textContent=detail; }
+  function data() { const gantry=gantries.find(x=>x.id===$('gantry').value); const components=numeric('components')+gantry.mass; return { motor: motors.find(x=>x.id===$('motor').value), actuator:actuators.find(x=>x.id===$('actuator').value), gantry, travel:numeric('travel'), orientation:$('orientation').value, angle:numeric('angle'), load:numeric('load'), components, offset:numeric('offset'), speed:numeric('speed'), accel:numeric('accel'), microsteps:numeric('microsteps'), current:numeric('current'), fos:Math.max(1,numeric('fos')), get movingMass(){return this.load+this.components} }; }
+  function capacity(d, speed) {
+    const rpm = speed / d.actuator.lead;
+    // OpenBuilds' 345 oz-in / 8 mm screw actuator measured 294 N at 2,000 mm/min
+    // (250 rpm) and stalled unloaded at 5,500 mm/min (687.5 rpm), on a 24 V,
+    // 1.25 A, 8x setup. The fitted exponent reproduces the 294 N point from the
+    // published holding-torque/transmission calculation. Other combinations are
+    // explicitly derated estimates, not substituted manufacturer torque curves.
+    // The 24 V chopper supply must overcome both inductance and the winding's
+    // I×R voltage drop. This preserves the measured 345 oz-in / 1.25 A reference.
+    const voltageHeadroom = Math.max(.4, (24 - d.current*d.motor.resistance) / (24 - 1.25*1.2));
+    const noLoadRpm = (5500 / 8) * Math.sqrt(4 / d.motor.inductance) * Math.sqrt(voltageHeadroom) * Math.pow(Math.max(.5, d.current / 1.25), .15);
+    const currentRatio = Math.min(1, d.current / d.motor.current);
+    const isMeasuredReference = d.motor.id === 'nema23-345-300' && d.actuator.type === 'screw';
+    const estimateDerate = isMeasuredReference ? 1 : .75;
+    const curveExponent = isMeasuredReference ? 2.2 : 1.65;
+    const runningFraction = Math.max(0, 1 - (rpm / noLoadRpm) ** curveExponent);
+    const staticTorqueNm = d.motor.torque * .0980665 * currentRatio;
+    const torqueNm = staticTorqueNm * runningFraction * estimateDerate;
+    const rawForce = d.actuator.type === 'screw' ? torqueNm * d.actuator.efficiency * (2*Math.PI) / (d.actuator.lead/1000) : torqueNm * d.actuator.efficiency / ((d.actuator.lead/1000)/(2*Math.PI));
+    return {force:rawForce/d.fos, rawForce, rpm, noLoadRpm, torqueNm, isMeasuredReference, estimateDerate};
+  }
+  function requirement(d, accel=d.accel) {
+    const g=9.80665, theta=d.orientation==='vertical'?90:d.orientation==='horizontal'?0:d.angle;
+    const gravity=d.movingMass*g*Math.sin(theta*Math.PI/180), friction=d.movingMass*g*d.actuator.friction*Math.cos(theta*Math.PI/180), acceleration=d.movingMass*(accel/1000);
+    return {total:gravity+friction+acceleration, gravity, friction, acceleration};
+  }
+  function maxPayloadAtSpeed(d, speed) {
+    const theta=(d.orientation==='vertical'?90:d.orientation==='horizontal'?0:d.angle)*Math.PI/180;
+    const perKg=9.80665*Math.sin(theta)+9.80665*d.actuator.friction*Math.cos(theta)+d.accel/1000;
+    return Math.max(0, capacity(d,speed).force/Math.max(perKg,.001)-d.components);
+  }
+  function rawPayloadAtSpeed(d, speed) {
+    const theta=(d.orientation==='vertical'?90:d.orientation==='horizontal'?0:d.angle)*Math.PI/180;
+    const perKg=9.80665*Math.sin(theta)+9.80665*d.actuator.friction*Math.cos(theta)+d.accel/1000;
+    return Math.max(0, capacity(d,speed).rawForce/Math.max(perKg,.001)-d.components);
+  }
+  function payloadForce(d, payload) {
+    const theta=(d.orientation==='vertical'?90:d.orientation==='horizontal'?0:d.angle)*Math.PI/180;
+    const perKg=9.80665*Math.sin(theta)+9.80665*d.actuator.friction*Math.cos(theta)+d.accel/1000;
+    return (payload+d.components)*perKg;
+  }
+  function maxSpeed(d) { let lo=0, hi=capacity(d,0).noLoadRpm*d.actuator.lead; for(let i=0;i<40;i++){let mid=(lo+hi)/2; if(capacity(d,mid).force>=requirement(d).total)lo=mid;else hi=mid;} return lo; }
+  function renderProfile(d) {
+    const v=d.speed/60, a=d.accel, distance=d.travel, ramp=v*v/a;
+    const triangular = ramp > distance; const peak = triangular ? Math.sqrt(a*distance) : v; const rampDistance = peak*peak/(2*a); const cruise=Math.max(0,distance-2*rampDistance);
+    const svg=$('profile'), width=Math.max(360,svg.clientWidth||900), left=42, right=width-12, top=28, bottom=160;
+    svg.setAttribute('viewBox',`0 0 ${width} 190`);
+    const X=x=>left+x/distance*(right-left), Y=y=>bottom-y/Math.max(peak,1)*(bottom-top);
+    const pts = triangular ? [[0,0],[distance/2,peak],[distance,0]] : [[0,0],[rampDistance,peak],[rampDistance+cruise,peak],[distance,0]];
+    svg.innerHTML=`<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="#9e9e9e"/><line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" stroke="#9e9e9e"/><polyline points="${pts.map(p=>X(p[0])+','+Y(p[1])).join(' ')}" fill="none" stroke="#1976d2" stroke-width="3"/><text x="${left}" y="184" fill="#555" font-size="14">0</text><text x="${right}" y="184" text-anchor="end" fill="#555" font-size="14">${fmt(distance)} mm</text><text x="${left}" y="16" fill="#555" font-size="14">${fmt(peak*60)} mm/min</text>`;
+    const time = triangular ? 2*peak/a : 2*peak/a + cruise/peak;
+    $('profileNote').textContent = triangular ? `The travel is too short to reach the requested speed; peak speed is ${fmt(peak*60)} mm/min (${fmt(time,2)} s move).` : `The requested speed is reached, with ${fmt(cruise)} mm of constant-speed travel (${fmt(time,2)} s move).`;
+  }
+  function renderCurve(svgId, d, maxSpeed, valueAt, label, requested, selectedSpeed=d.speed, selectedDescriptor='raw', rawValueAt=null, forceAtValue=null, intersectionSpeed=null) {
+    const samples=32, points=[]; for(let i=0;i<=samples;i++){ const speed=maxSpeed*i/samples; points.push([speed,valueAt(speed)]); }
+    const rawPoints=rawValueAt ? points.map(p=>[p[0],rawValueAt(p[0])]) : [];
+    const svg=$(svgId), width=Math.max(360,svg.clientWidth||900), left=42, right=forceAtValue?width-43:width-12, top=28, bottom=160;
+    svg.setAttribute('viewBox',`0 0 ${width} 190`);
+    const maxValue=Math.max(...points.map(p=>p[1]), ...rawPoints.map(p=>p[1]), requested||0)*1.12 || 1, X=x=>left+x/maxSpeed*(right-left), Y=y=>bottom-y/maxValue*(bottom-top);
+    const curve=points.map(p=>`${X(p[0])},${Y(p[1])}`).join(' ');
+    const rawCurve=rawPoints.length ? `<polyline points="${rawPoints.map(p=>`${X(p[0])},${Y(p[1])}`).join(' ')}" fill="none" stroke="#757575" stroke-width="2.5" stroke-dasharray="6 4"/>` : '';
+    const demand=requested ? `<line x1="${left}" y1="${Y(requested)}" x2="${right}" y2="${Y(requested)}" stroke="#b42318" stroke-width="2" stroke-dasharray="5 3"/>` : '';
+    const selectedValue=valueAt(selectedSpeed), selectedX=X(Math.min(maxSpeed,selectedSpeed)), selectedLabel=forceAtValue ? `${fmt(selectedSpeed)} mm/min → max ${fmt(selectedValue,1)} kg / ${fmt(forceAtValue(selectedValue))} N` : `At ${fmt(selectedSpeed)}: ${fmt(selectedValue,1)} ${label} ${selectedDescriptor}`;
+    const selectedAnchor=selectedX>width-155?'end':'start', selectedTextX=selectedAnchor==='end'?selectedX-5:selectedX+5;
+    const selectedY=Y(selectedValue);
+    const selected=`<line x1="${selectedX}" y1="${selectedY}" x2="${selectedX}" y2="${bottom}" stroke="#1976d2" stroke-width="2" stroke-dasharray="4 3"/><line x1="${left}" y1="${selectedY}" x2="${selectedX}" y2="${selectedY}" stroke="#1976d2" stroke-width="2" stroke-dasharray="4 3"/><circle cx="${selectedX}" cy="${selectedY}" r="4" fill="#1976d2"/><text x="${selectedTextX}" y="${Math.max(top+13,selectedY-7)}" text-anchor="${selectedAnchor}" fill="#1976d2" font-size="13">${selectedLabel}</text>`;
+    const intersectionX=intersectionSpeed===null?0:X(Math.min(maxSpeed,intersectionSpeed)), intersectionAnchor=intersectionX>width-150?'end':'start', intersectionTextX=intersectionAnchor==='end'?intersectionX-5:intersectionX+5;
+    const intersection=intersectionSpeed===null?'':`<circle cx="${intersectionX}" cy="${Y(requested)}" r="4" fill="#b42318"/><text x="${intersectionTextX}" y="${Math.max(top+27,Y(requested)-7)}" text-anchor="${intersectionAnchor}" fill="#b42318" font-size="13">${fmt(requested,1)} ${label} → max ${fmt(intersectionSpeed)} mm/min</text>`;
+    let grid='';
+    for(let i=0;i<=4;i++) { const ratio=i/4, x=X(maxSpeed*ratio), y=Y(maxValue*ratio), value=maxValue*ratio; const forceTick=forceAtValue?`<text x="${right+5}" y="${y+5}" fill="#4c5662" font-size="13">${fmt(forceAtValue(value))} N</text>`:''; grid+=`<line x1="${left}" y1="${y}" x2="${right}" y2="${y}" stroke="#e2e6ea"/><text x="${left-5}" y="${y+5}" text-anchor="end" fill="#4c5662" font-size="13">${fmt(value,1)}</text>${forceTick}<line x1="${x}" y1="${top}" x2="${x}" y2="${bottom}" stroke="#edf0f2"/><text x="${x}" y="184" text-anchor="middle" fill="#4c5662" font-size="13">${fmt(maxSpeed*ratio)}</text>`; }
+    const units=forceAtValue ? `<text x="${left}" y="16" fill="#555" font-size="13">kg</text><text x="${right+5}" y="16" fill="#555" font-size="13">N</text>` : `<text x="${left}" y="16" fill="#555" font-size="13">${label}</text>`;
+    svg.innerHTML=`${grid}<line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="#9e9e9e"/><line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" stroke="#9e9e9e"/>${rawCurve}<polyline points="${curve}" fill="none" stroke="#1976d2" stroke-width="3"/>${demand}${selected}${intersection}${units}`;
+  }
+  function renderCapability(d, speedLimit, requiredForce) {
+    const graphSpeed=Math.max(1000, Math.min(capacity(d,0).noLoadRpm*d.actuator.lead, Math.max(d.speed*1.25, speedLimit*1.2)));
+    renderCurve('loadCurve',d,graphSpeed,s=>maxPayloadAtSpeed(d,s),'kg',d.load,d.speed,'safe payload',null,p=>payloadForce(d,p),speedLimit);
+  }
+  function update() {
+    const d=data(), c=capacity(d,d.speed), r=requirement(d), margin=c.force-r.total;
+    // The entered offset belongs to the payload. Gantry and auxiliary moving parts are
+    // included in drive force but not assumed to share the payload's lever arm.
+    const moment=d.load*(9.80665+d.accel/1000)*(d.offset/1000), momentLimit=Math.min(d.gantry.my,d.gantry.mz)/d.fos;
+    const wheelDemand=d.movingMass*(9.80665+d.accel/1000), wheelLimit=d.gantry.wheelCount*d.gantry.wheelStatic/d.fos;
+    if (d.current > 1.4) { $('current').value = '1.4'; return update(); }
+    const theta=(d.orientation==='vertical'?90:d.orientation==='horizontal'?0:d.angle)*Math.PI/180, perKg=9.80665*Math.sin(theta)+9.80665*d.actuator.friction*Math.cos(theta)+d.accel/1000;
+    const fixedForce=d.components*perKg, maxLoad=Math.max(0,(c.force-fixedForce)/perKg); const suggestedAccel=Math.max(0,(c.force-(r.gravity+r.friction))/Math.max(d.movingMass,.001)*1000);
+    const speedLimit=maxSpeed(d), speedPass=d.speed<=speedLimit, torquePass=margin>=0, momentPass=moment<=momentLimit, wheelsPass=wheelDemand<=wheelLimit, hardLimit=d.travel>d.actuator.maxTravel || !speedPass || !torquePass || !momentPass || !wheelsPass;
+    $('actuatorHint').textContent=d.actuator.note; $('motorHint').textContent=`${d.motor.torque} kg-cm holding torque · ${d.motor.resistance} Ω · ${d.motor.inductance} mH · ${fmt(d.motor.voltage,2)} V phase (I×R)`; $('gantryHint').textContent=`${d.gantry.mass} kg · ${d.gantry.wheelCount} × ${d.gantry.wheel} · static My ${d.gantry.my} Nm / Mz ${d.gantry.mz} Nm`;
+    $('angleWrap').style.display=d.orientation==='angle'?'block':'none';
+    $('rawDriveForce').textContent=`${fmt(c.rawForce)} N`; $('driveForce').textContent=`${fmt(c.force)} N`; $('requiredForce').textContent=`${fmt(r.total)} N`; $('margin').textContent=`${fmt(margin)} N`; $('maxLoad').textContent=`${fmt(maxLoad,1)} kg`; $('maxSpeed').textContent=`${fmt(speedLimit)} mm/min`; $('maxAccel').textContent=`${fmt(suggestedAccel)} mm/s²`; $('moment').textContent=`${fmt(moment,2)} / ${fmt(momentLimit,2)} Nm`;
+    validation('checkSpeed', speedPass, speedPass?'PASS':'FAIL', `${fmt(d.speed)} requested / ${fmt(speedLimit)} mm/min estimated maximum`);
+    validation('checkTorque', torquePass, torquePass?'PASS':'FAIL', `${fmt(c.force)} N available vs ${fmt(r.total)} N required`);
+    validation('checkMoment', momentPass, momentPass?'PASS':'FAIL', `${fmt(moment,2)} / ${fmt(momentLimit,2)} Nm · use true CoM offset`);
+    validation('checkWheels', wheelsPass, wheelsPass?'PASS':'FAIL', `${d.gantry.wheelCount} × ${d.gantry.wheel}: ${fmt(wheelDemand)} / ${fmt(wheelLimit)} N`);
+    const status=$('status');
+    if(hardLimit){ status.className='status bad'; status.textContent=d.travel>d.actuator.maxTravel ? 'Not recommended: requested travel exceeds this actuator model’s listed range.' : 'Not recommended: one or more independent checks have failed. Review the red validation cards.'; }
+    else if(margin/c.force<.2){ status.className='status warn'; status.textContent='Low margin: workable by the estimate, but validate with a physical stall and thermal test.'; }
+    else { status.className='status good'; status.textContent='First-pass result: requested motion is within the conservative calculated drive-force envelope.'; }
+    $('limiter').textContent = d.orientation==='vertical' ? 'Gravity is continuously consuming motor force; speed then reduces available running torque.' : 'Acceleration and carriage friction are the main calculated demands; speed reduces available running torque.';
+    const stepsPerMm=(d.motor.steps*d.microsteps)/d.actuator.lead, stepHz=d.speed*stepsPerMm/60;
+    const curveSource=c.isMeasuredReference ? 'Measured-reference fit: 345 oz-in + 8 mm screw' : `Estimated curve: 75% derate (no measured curve)`;
+    $('details').innerHTML=`<dt>Curve basis</dt><dd>${curveSource}</dd><dt>Total moving mass</dt><dd>${fmt(d.movingMass,2)} kg</dd><dt>Motor speed</dt><dd>${fmt(c.rpm)} rpm</dd><dt>No-load stall point</dt><dd>${fmt(c.noLoadRpm*d.actuator.lead)} mm/min</dd><dt>Step rate</dt><dd>${fmt(stepHz)} Hz (${fmt(stepsPerMm)} steps/mm)</dd><dt>Gravity / friction / acceleration</dt><dd>${fmt(r.gravity)} / ${fmt(r.friction)} / ${fmt(r.acceleration)} N</dd>`;
+    const query=new URLSearchParams({actuator:d.actuator.id,motor:d.motor.id,gantry:d.gantry.id,travel:d.travel,orientation:d.orientation,load:d.load,components:numeric('components'),offset:d.offset,speed:d.speed,accel:d.accel,microsteps:d.microsteps,current:d.current,fos:d.fos}); history.replaceState(null,'','?'+query);
+    renderProfile(d);
+    renderCapability(d,speedLimit,r.total);
+  }
+  $('form').addEventListener('input',update); $('form').addEventListener('change',update); update();
+})();
+</script>
+</body>
+</html>
