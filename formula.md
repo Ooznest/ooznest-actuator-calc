@@ -201,10 +201,10 @@ The calculator also applies independent checks for the selected gantry plate:
 
 ```text
 M_payload = payload × (g + acceleration / 1000) × (offset / 1000)
-M_limit = min(My, Mz) / FOS
+M_limit = min(My, Mz)
 
 wheelDemand = movingMass × (g + acceleration / 1000)
-wheelLimit = wheelCount × wheelStatic / FOS
+wheelLimit = wheelCount × wheelStatic
 ```
 
 Acceleration is entered in mm/s² and offset in mm; the resulting moment is Nm
@@ -290,8 +290,9 @@ power-supply voltage.
 | `vslot-medium` | Medium V-Slot · 100×88 mm | 0.058 | Regular V-wheel | 21.939 | 4.388 | 144.71 |
 | `vslot-large` | Large V-Slot · 127×88 mm | 0.073 | Regular V-wheel | 21.939 | 4.388 | 144.71 |
 
-Wheel ratings are per wheel; the calculator assumes four wheels and divides
-the combined rating by FOS for its pass/fail check.
+The gantry moment and wheel ratings are treated as already factored and are
+not divided by the user FOS. Wheel ratings are per wheel; the calculator
+assumes four wheels and sums the published per-wheel ratings.
 
 ## Data and Tunable Constants
 
