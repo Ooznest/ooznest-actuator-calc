@@ -30,7 +30,7 @@
     <div class="frame-shell">
       <iframe
         title="Linear actuator calculator"
-        src="calc.html?actuator=cbeam-screw&motor=nema23-345-300&gantry=cbeam-large&travel=500&orientation=vertical&load=5&components=0.5&offset=0&speed=2000&accel=100&microsteps=16&current=1.4&fos=2&embedPreview=7"
+        src="calc.html?v=20260917.2&actuator=cbeam-screw&motor=nema23-345-300&gantry=cbeam-large&travel=500&orientation=vertical&load=5&components=0.5&offset=0&speed=2000&accel=100&microsteps=16&current=1.4&fos=2&embedPreview=7"
         width="700"
         height="420"
         loading="eager"></iframe>
@@ -51,7 +51,7 @@
       updateFrameUrl();
     };
     updateFrameUrl();
-    Promise.all([fetch('transmission.json', { cache: 'no-store' }).then(response => response.json()), fetch('gantryplates.json', { cache: 'no-store' }).then(response => response.json())]).then(([actuators, gantries]) => {
+    Promise.all([fetch('transmission.json?v=20260917.2', { cache: 'no-store' }).then(response => response.json()), fetch('gantryplates.json?v=20260917.2', { cache: 'no-store' }).then(response => response.json())]).then(([actuators, gantries]) => {
       actuatorSelect.innerHTML = actuators.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
       gantrySelect.innerHTML = gantries.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
       actuatorSelect.value = params.get('actuator') || actuators[0].id;

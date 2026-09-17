@@ -1,5 +1,6 @@
 (async () => {
-  const [motors, actuators, gantries] = await Promise.all(['motors.json','transmission.json','gantryplates.json'].map(file => fetch(file).then(response => {
+  const cacheVersion = '20260917.2';
+  const [motors, actuators, gantries] = await Promise.all(['motors.json','transmission.json','gantryplates.json'].map(file => fetch(`${file}?v=${cacheVersion}`, {cache:'no-store'}).then(response => {
     if (!response.ok) throw new Error(`Unable to load ${file}`);
     return response.json();
   })));
