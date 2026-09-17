@@ -3,77 +3,62 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Linear actuator calculator</title>
+  <title>Actuator calculator embed preview</title>
   <style>
-    :root { --primary:#1976d2; --ink:#2f373c; --muted:rgba(0,0,0,.6); --line:#e0e0e0; --soft:#fafafa; --good:#388e3c; --warn:#f57c00; --bad:#d32f2f; }
-    * { box-sizing:border-box } body { margin:0; font:14px/1.5 Roboto,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
-    main { max-width:1180px; margin:0 auto; padding:12px; } h1 { margin:0; color:var(--ink); font-size:24px; line-height:36px; font-weight:500; } h2 { color:var(--ink); font-size:20px; line-height:30px; font-weight:500; margin:16px 0 8px; } h3 { color:var(--ink); font-size:14px; font-weight:500; margin:0 0 6px; } p { margin:5px 0; }
-    .intro { color:var(--muted); font-size:13px; } .grid { display:grid; grid-template-columns:1fr; gap:0; margin-top:4px; }
-    .panel { border:0; border-top:1px solid var(--line); border-radius:0; padding:0 0 12px; } #form { order:1; grid-column:1/-1; border-top:0; } #resultPanel { order:2; grid-column:1/-1; } #capabilitiesCard { order:3; } .inputs { display:grid; grid-template-columns:repeat(4,1fr); gap:10px 12px; }
-    label { display:block; font-size:11px; font-weight:500; letter-spacing:.02em; text-transform:uppercase; color:rgba(0,0,0,.6); } input,select { margin-top:3px; width:100%; height:34px; border:1px solid #bdbdbd; border-radius:0; padding:6px 8px; font:14px Roboto,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
-    input:focus,select:focus { outline:2px solid rgba(25,118,210,.3); border-color:var(--primary); } .full { grid-column:1/-1; } .hint { font-size:11px; line-height:1.35; color:var(--muted); margin-top:3px; } .results { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--line); }
-    .metric { display:grid; grid-template-columns:1fr auto; align-items:center; gap:5px; background:#fff; padding:4px 7px; border-left:1px solid var(--line); min-height:34px; } .metric:first-child { border-left:0; } .metric span { display:block; color:var(--muted); font-size:10px; } .metric strong { display:block; color:var(--ink); font-size:14px; font-weight:500; margin-top:0; text-align:right; }
-    .validations { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:0 0 10px; border:1px solid var(--line); } .validation { display:grid; grid-template-columns:1fr auto; align-items:center; column-gap:6px; border:0; border-left:1px solid var(--line); border-radius:0; padding:5px 8px; min-height:42px; } .validation:first-child { border-left:0; } .validation span { display:block; color:var(--muted); font-size:10px; } .validation strong { display:block; margin-top:0; font-size:13px; font-weight:500; text-align:right; } .validation small { grid-column:1/-1; display:block; margin-top:1px; font-size:10px; line-height:1.2; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; } .validation.pass { border-bottom:3px solid var(--good); } .validation.fail { border-bottom:3px solid var(--bad); background:#fffafa; }
-    .status { margin:8px 0; border-radius:0; border-left:3px solid var(--primary); padding:7px 10px; font-size:13px; font-weight:500; } .good { background:#f5f5f5; color:var(--ink); } .warn { background:#fff8e1; color:#6d4c00; } .bad { background:#ffebee; color:#b71c1c; }
-    .detail { order:4; grid-column:1/-1; margin-top:10px; border-top:1px solid var(--line); padding-top:8px; color:var(--muted); font-size:11px; } .detail dl { display:grid; grid-template-columns:1fr auto; gap:3px 12px; margin:5px 0 0; } .detail dd { margin:0; font-weight:500; color:var(--ink); }
-    .chart { grid-column:1/-1; } .chartbox { height:185px; background:#fff; border:1px solid var(--line); padding:8px; } .capability-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } svg { width:100%; height:100%; overflow:visible; } .legend { display:flex; gap:12px; font-size:11px; color:var(--muted); flex-wrap:wrap; } .key { width:10px; height:10px; display:inline-block; margin-right:4px; background:var(--primary); } .key.gray { background:#757575; } .key.dashed { background:linear-gradient(90deg,#757575 55%,transparent 55%); } .key.red { background:#b42318; }
-    .notice { margin-top:12px; border-left:3px solid var(--primary); background:#f5f5f5; padding:9px 12px; font-size:11px; } details { margin-top:10px; border-top:1px solid var(--line); padding-top:8px; } summary { cursor:pointer; color:var(--ink); font-size:13px; font-weight:500; } code { background:#f5f5f5; padding:2px 4px; } @media(max-width:800px){ main{max-width:760px;padding:10px}.results,.validations{grid-template-columns:1fr 1fr}.inputs,.capability-charts{grid-template-columns:1fr}.full{grid-column:auto} } @media(min-width:801px){ .capability-charts .chartbox{height:170px} }
+    :root { color-scheme: light; font: 14px/1.4 Arial, sans-serif; color: #2f373c; background: #f4f5f6; }
+    body { margin: 0; padding: 24px; }
+    h1 { margin: 0 0 12px; font-size: 20px; font-weight: 500; }
+    .preview { width: min(700px, 100%); }
+    .controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    label { display: grid; gap: 4px; color: #5f6870; font-size: 12px; }
+    select, input { width: 100%; height: 32px; border: 1px solid #b9c0c5; background: #fff; padding: 4px 6px; font: inherit; color: #2f373c; }
+    .frame-url { margin: 0 0 10px; }
+    .frame-url input { font: 11px/1.2 Consolas, monospace; color: #49545b; }
+    .frame-shell { border: 2px dashed #78909c; border-radius: 10px; padding: 6px; background: rgba(120, 144, 156, .06); }
+    iframe { display: block; width: 700px; height: 420px; max-width: 100%; border: 1px solid #c8cdd1; border-radius: 4px; background: #fff; }
+    p { color: #5f6870; margin: 10px 0 0; }
   </style>
 </head>
 <body>
-<main>
-  <section class="grid">
-    <form class="panel" id="form">
-      <div class="inputs">
-        <label class="full">Drive system<select id="actuator"></select><span class="hint" id="actuatorHint"></span></label>
-        <label>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label>
-        <label>Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option><option value="angle">Inclined</option></select></label>
-        <label>Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label>
-        <label>Requested speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label>
-        <label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label>
-      </div>
-      <details open><summary>More configuration</summary><div class="inputs">
-        <label>Travel (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label>
-        <label id="angleWrap">Incline from horizontal (°)<input id="angle" type="number" min="0" max="90" value="45"></label>
-        <label>Extra moving parts (kg)<input id="components" type="number" min="0" max="50" step="0.05" value="0.50"></label>
-        <label>Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label>
-        <label>Payload centre offset (mm)<input id="offset" type="number" min="0" max="1000" step="1" value="0"></label>
-        <label>Acceleration (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label>
-        <label>Microstepping<input id="microsteps" type="number" min="1" max="32" step="1" value="16"></label>
-        <label>Driver current (A)<input id="current" type="number" min="0.1" max="1.4" step="0.1" value="1.4"></label>
-      </div><p class="hint">Assumes a 24 V TB67S109-class constant-current driver at 1.4 A and 16× microstepping. Firmware settings are not treated as hard limits.</p></details>
-    </form>
-    <section class="panel" id="resultPanel">
-      <div id="status" class="status"></div>
-      <div class="validations">
-        <div class="validation" id="checkSpeed"><span>Speed capability</span><strong>—</strong><small>—</small></div>
-        <div class="validation" id="checkTorque"><span>Motor torque</span><strong>—</strong><small>—</small></div>
-        <div class="validation" id="checkMoment"><span>Moment load</span><strong>—</strong><small>—</small></div>
-        <div class="validation" id="checkWheels"><span>Wheels / plate</span><strong>—</strong><small>—</small></div>
-      </div>
-      <div class="results">
-        <div class="metric"><span>Drive force before safety factor</span><strong id="rawDriveForce">—</strong></div>
-        <div class="metric"><span>Design drive force</span><strong id="driveForce">—</strong></div>
-        <div class="metric"><span>Required force</span><strong id="requiredForce">—</strong></div>
-        <div class="metric"><span>Force margin</span><strong id="margin">—</strong></div>
-        <div class="metric"><span>Max load at speed</span><strong id="maxLoad">—</strong></div>
-        <div class="metric"><span>Max speed at load</span><strong id="maxSpeed">—</strong></div>
-        <div class="metric"><span>Suggested max accel</span><strong id="maxAccel">—</strong></div>
-        <div class="metric"><span>Gantry moment</span><strong id="moment">—</strong></div>
-      </div>
-    </section>
-    <section class="panel chart" id="capabilitiesCard">
-      <h2>Motion and force capability</h2>
-      <div class="capability-charts">
-        <div><h3>Speed over travel</h3><div class="legend"><span><i class="key"></i>Requested profile</span></div><div class="chartbox"><svg id="profile" role="img" aria-label="Speed profile over travel"></svg></div><p class="hint" id="profileNote"></p></div>
-        <div><h3>Maximum payload at speed</h3><div class="legend"><span><i class="key"></i>Maximum payload</span><span><i class="key red"></i>Requested payload</span></div><div class="chartbox"><svg id="loadCurve" role="img" aria-label="Payload capacity over speed"></svg></div></div>
-      </div>
-      <p class="hint">Blue is maximum payload with the selected safety factor. The red line is the requested payload; its intersection with blue is the design stall point.</p>
-    </section>
-    <div class="detail"><strong>What is limiting it?</strong><div id="limiter"></div><dl id="details"></dl></div>
-  </section>
-  <p class="hint"><code>?actuator=cbeam-screw&amp;travel=500&amp;motor=nema23-345-300&amp;orientation=vertical&amp;load=10&amp;speed=1200&amp;fos=2</code></p>
-</main>
-<script src="index.js"></script>
+  <div class="preview">
+    <h1>Embedded actuator calculator preview</h1>
+    <div class="controls">
+      <label>Actuator<select id="actuator"></select></label>
+      <label>Gantry plate<select id="gantry"></select></label>
+    </div>
+    <label class="frame-url">Injected iframe URL<input id="frameUrl" type="text" readonly></label>
+    <div class="frame-shell">
+      <iframe
+        title="Linear actuator calculator"
+        src="calc.html?actuator=cbeam-screw&motor=nema23-345-300&gantry=cbeam-large&travel=500&orientation=vertical&load=5&components=0.5&offset=0&speed=2000&accel=100&microsteps=16&current=1.4&fos=2&embedPreview=7"
+        width="700"
+        height="420"
+        loading="eager"></iframe>
+    </div>
+    <p>Target embed size: 700 × 420 px.</p>
+  </div>
+  <script>
+    const actuatorSelect = document.getElementById('actuator');
+    const gantrySelect = document.getElementById('gantry');
+    const frame = document.querySelector('iframe');
+    const frameUrl = document.getElementById('frameUrl');
+    const params = new URL(frame.src).searchParams;
+    const updateFrameUrl = () => { frameUrl.value = frame.src; };
+    const refresh = () => {
+      params.set('actuator', actuatorSelect.value);
+      params.set('gantry', gantrySelect.value);
+      frame.src = `calc.html?${params.toString()}`;
+      updateFrameUrl();
+    };
+    updateFrameUrl();
+    Promise.all([fetch('transmission.json', { cache: 'no-store' }).then(response => response.json()), fetch('gantryplates.json', { cache: 'no-store' }).then(response => response.json())]).then(([actuators, gantries]) => {
+      actuatorSelect.innerHTML = actuators.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+      gantrySelect.innerHTML = gantries.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
+      actuatorSelect.value = params.get('actuator') || actuators[0].id;
+      gantrySelect.value = params.get('gantry') || gantries[0].id;
+      actuatorSelect.addEventListener('change', refresh);
+      gantrySelect.addEventListener('change', refresh);
+    });
+  </script>
 </body>
 </html>
