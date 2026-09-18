@@ -29,6 +29,7 @@
     <a onclick="loadDiagram(3)"><span class="tag">03</span> Motor speed / torque / drive force</a>
     <a onclick="loadDiagram(4)"><span class="tag">04</span> Required force &amp; payload capacity</a>
     <a onclick="loadDiagram(5)"><span class="tag">05</span> Limits, pass/fail &amp; safety factor</a>
+    <a onclick="loadDiagram(10)"><span class="tag">10</span> Current calculation detail</a>
     <h2>Customer outputs</h2>
     <a onclick="loadDiagram(6)"><span class="tag">06</span> Payload / speed chart</a>
     <a onclick="loadDiagram(7)"><span class="tag">07</span> Motion profile &amp; constant-speed travel</a>
@@ -43,7 +44,7 @@
   <div id="empty"><strong>☰</strong><span>Select a diagram to view it fullscreen.</span><small>Scroll to zoom · drag to pan</small></div>
   <script>
     mermaid.initialize({startOnLoad:false,theme:'base',securityLevel:'loose',themeVariables:{fontFamily:'system-ui, sans-serif',background:'#fff',primaryColor:'#ddf4ff',primaryTextColor:'#1f2328',primaryBorderColor:'#54aeff',lineColor:'#0969da',secondaryColor:'#f6f8fa',tertiaryColor:'#fff8c5',clusterBkg:'#f6f8fa',clusterBorder:'#d0d7de',nodeBorder:'#d0d7de',nodeTextColor:'#1f2328',edgeLabelBackground:'#fff'}});
-    const names=['00 — Full application flow','01 — Host page and iframe parameters','02 — Startup, data sources and state','03 — Motor speed, torque and drive force','04 — Required force and payload capacity','05 — Limits, pass/fail and safety factor','06 — Payload / speed chart','07 — Motion profile and travel','08 — Plate and wheel rating audit','09 — Compatibility and integration roadmap'];
+    const names=['00 — Full application flow','01 — Host page and iframe parameters','02 — Startup, data sources and state','03 — Motor speed, torque and drive force','04 — Required force and payload capacity','05 — Limits, pass/fail and safety factor','06 — Payload / speed chart','07 — Motion profile and travel','08 — Plate and wheel rating audit','09 — Compatibility and integration roadmap','10 — Current calculation detail'];
     const defs=[
 `flowchart TB
   Host["Hosted index.html<br/>iframe preview / resource-page pattern"] --> Controls["External controls<br/>Actuator + Gantry plate"]
@@ -210,6 +211,130 @@
   URL --> Resources["Resource pages / product pages<br/>embed a preconfigured calculator"]
   Current --> Safety["Add engineering scope notice<br/>Beam / extrusion deflection not calculated<br/>Validate structure, mounting, thermal duty and physical stall test"]
   Current --> Ratings["Correct rating architecture<br/>Drive: user FOS<br/>Published gantry / plate ratings: no extra FOS<br/>Wheel data: source-specific treatment"]
+`,
+`flowchart TB
+  subgraph A["1. Selected configuration and mass"]
+    Direction["Actuator orientation<br/>vertical or horizontal"]
+    Motion["Length, speed, acceleration<br/>microsteps, driver current, FOS"]
+    Motor["Motor data<br/>holding torque, rated current, R, L, steps"]
+    Actuator["Actuator data<br/>lead, efficiency, friction, type, max travel"]
+    Plate["Gantry data<br/>plate mass, radial and axial ratings, My, Mz"]
+    Payload["Payload kg"]
+    PlateMass["Moving mass = payload + selected plate mass"]
+    Payload --> PlateMass
+    Plate --> PlateMass
+  end
+
+  subgraph B["2. Speed-dependent motor / drive capacity"]
+    RPM["motor RPM = requested speed / lead"]
+    Headroom["voltage headroom = max(0.4, (24 - I x R) / 22.5)"]
+    NoLoad["no-load RPM = 687.5 x sqrt(4 / L) x sqrt(headroom) x max(0.5, I / 1.25)^0.15"]
+    Ratio["current ratio = min(1, driver current / motor rated current)"]
+    Curve["speed fraction = max(0, 1 - (RPM / no-load RPM)^exponent)"]
+    Confidence["reference pair: exponent 2.2, derate 1.0<br/>all other pairs: exponent 1.65, derate 0.75"]
+    Torque["running torque = holding torque x 0.0980665 x current ratio x speed fraction x derate"]
+    RawForce["raw linear force<br/>screw: torque x efficiency x 2pi / lead(m)<br/>belt: torque x efficiency / (lead(m) / 2pi)"]
+    DriveForce["design drive force = raw force / user FOS"]
+    Motion --> RPM
+    Motor --> Headroom
+    Motion --> Headroom
+    Motor --> NoLoad
+    Headroom --> NoLoad
+    Motion --> Ratio
+    RPM --> Curve
+    NoLoad --> Curve
+    Confidence --> Curve
+    Motor --> Torque
+    Ratio --> Torque
+    Curve --> Torque
+    Confidence --> Torque
+    Actuator --> RawForce
+    Torque --> RawForce
+    Motion --> DriveForce
+    RawForce --> DriveForce
+  end
+
+  subgraph C["3. Required motion force"]
+    Theta["theta = 90 degrees vertical, 0 degrees horizontal"]
+    Gravity["gravity = moving mass x 9.80665 x sin(theta)"]
+    Friction["friction = moving mass x 9.80665 x actuator friction x cos(theta)"]
+    Inertia["inertia = moving mass x acceleration / 1000"]
+    PerKg["force per kg = gravity + friction + inertia, per kg"]
+    Required["required force = gravity + friction + inertia"]
+    Direction --> Theta
+    PlateMass --> Gravity
+    PlateMass --> Friction
+    PlateMass --> Inertia
+    Theta --> Gravity
+    Theta --> Friction
+    Actuator --> Friction
+    Motion --> Inertia
+    Theta --> PerKg
+    Actuator --> PerKg
+    Motion --> PerKg
+    Gravity --> Required
+    Friction --> Required
+    Inertia --> Required
+  end
+
+  subgraph D["4. Independent mechanical checks"]
+    PlateDirection["Plate orientation<br/>Radial (Vertical) or Axial (Horizontal)"]
+    PlateLimit["usable plate load<br/>radial: actual Cy / FOS<br/>axial: actual Cz at selected rail width / FOS"]
+    PlateDemand["plate demand = moving mass x (9.80665 + acceleration / 1000)"]
+    PlatePass["gantry plate pass when demand <= usable load"]
+    Moment["payload moment = payload x (9.80665 + acceleration / 1000) x offset(m)"]
+    MomentLimit["usable moment = min(actual My, actual Mz) / FOS"]
+    MomentPass["moment pass when payload moment <= usable moment"]
+    Plate --> PlateLimit
+    Motion --> PlateDirection
+    PlateDirection --> PlateLimit
+    PlateMass --> PlateDemand
+    Motion --> PlateDemand
+    PlateDemand --> PlatePass
+    PlateLimit --> PlatePass
+    Payload --> Moment
+    Motion --> Moment
+    Plate --> MomentLimit
+    Motion --> MomentLimit
+    Moment --> MomentPass
+    MomentLimit --> MomentPass
+  end
+
+  subgraph E["5. Results, speed search and graphs"]
+    TorquePass["motor torque pass when design force >= required force"]
+    SpeedSearch["maximum speed: 40-step binary search<br/>capacity(speed) force >= required force"]
+    SpeedPass["speed pass when requested speed <= maximum speed"]
+    Overall["not recommended if travel, speed, torque, moment or plate check fails"]
+    Sample["sample 33 speeds from zero to graph maximum"]
+    DrivePayload["drive payload = design force / force per kg - plate mass"]
+    PlatePayload["plate payload = usable plate load / (9.80665 + acceleration / 1000) - plate mass"]
+    CurvePayload["maximum payload = max(0, min(drive payload, plate payload))"]
+    PayloadGraph["Speed vs Payload Log<br/>blue: maximum payload at speed<br/>red: maximum speed with payload"]
+    Profile["Speed Log<br/>requested speed capped at calculated maximum<br/>triangular or trapezoidal travel profile"]
+    DriveForce --> TorquePass
+    Required --> TorquePass
+    DriveForce --> SpeedSearch
+    Required --> SpeedSearch
+    SpeedSearch --> SpeedPass
+    Motion --> SpeedPass
+    TorquePass --> Overall
+    SpeedPass --> Overall
+    MomentPass --> Overall
+    PlatePass --> Overall
+    Motion --> Overall
+    SpeedSearch --> Sample
+    Sample --> DrivePayload
+    Sample --> PlatePayload
+    DriveForce --> DrivePayload
+    PerKg --> DrivePayload
+    PlateLimit --> PlatePayload
+    DrivePayload --> CurvePayload
+    PlatePayload --> CurvePayload
+    CurvePayload --> PayloadGraph
+    SpeedSearch --> PayloadGraph
+    SpeedSearch --> Profile
+    Motion --> Profile
+  end
 `
     ];
     let instance=null,sidebarOpen=true;

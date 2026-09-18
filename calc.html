@@ -35,7 +35,7 @@
         <label class="span-3">Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label>
         <div class="setting-groups">
           <section class="setting-group"><h3>Actuator settings</h3><label>Length (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label><label>Accel. (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label><label>Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option></select></label><label>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label></section>
-          <section class="setting-group"><h3>Gantry / load settings</h3><label>Plate orientation<select id="plateDirection"><option value="vertical">Vertical · radial</option><option value="horizontal">Horizontal · axial</option></select></label><label>Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label><label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label><label>Speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label></section>
+          <section class="setting-group"><h3>Gantry / load settings</h3><label>Plate orientation<select id="plateDirection"><option value="vertical">Radial (Vertical)</option><option value="horizontal">Axial (Horizontal)</option></select></label><label>Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label><label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label><label>Speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label></section>
         </div>
       </div>
       <details><summary>More configuration</summary><div class="inputs">
@@ -46,6 +46,7 @@
       </div><p class="hint">Assumes a 24 V TB67S109-class constant-current driver at 1.4 A and 16× microstepping. Firmware settings are not treated as hard limits.</p></details>
     </form>
     <section class="panel" id="resultPanel">
+      <h2>Results</h2>
       <div id="status" class="status"></div>
       <div class="validations">
         <div class="validation" id="checkSpeed"><span>Speed capability</span><strong>—</strong><small>—</small></div>
@@ -65,7 +66,6 @@
       </div>
     </section>
     <section class="panel chart" id="capabilitiesCard">
-      <h2>Results</h2>
       <div class="capability-charts">
         <div><h3>Speed Log</h3><div class="legend"><span><i class="key"></i>Achievable profile</span><span><i class="key red"></i>Requested profile</span><span id="accelDistance">Acceleration: —</span></div><div class="chartbox"><svg id="profile" role="img" aria-label="Speed log over travel"></svg></div><p class="hint" id="profileNote"></p></div>
         <div><h3>Speed vs Payload Log</h3><div class="legend"><span><i class="key"></i>Maximum Payload at Speed</span><span><i class="key red"></i>Maximum Speed with Payload</span></div><div class="chartbox"><svg id="loadCurve" role="img" aria-label="Speed versus payload log"></svg></div></div>
