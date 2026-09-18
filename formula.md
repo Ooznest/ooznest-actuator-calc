@@ -147,9 +147,9 @@ F_required = m × (g·sin(θ) + g·μ·cos(θ) + a/1000)
 
 | Symbol | Value / Source    | Units  | Meaning |
 |--------|--------------------|--------|---------|
-| m      | movingMass         | kg     | Payload + gantry plate + extra components |
+| m      | movingMass         | kg     | Payload + selected gantry plate mass |
 | g      | 9.80665            | m/s²   | Standard gravity |
-| θ      | orientation angle  | rad    | 90° = vertical, 0° = horizontal |
+| θ      | orientation angle  | rad    | 90° = vertical, 0° = horizontal; inclined motion is not modelled |
 | μ      | actuator.friction  | —      | Coefficient of friction |
 | a      | accel              | mm/s²  | Requested acceleration |
 | a/1000 | —                  | m/s²   | Acceleration in SI units |
@@ -160,7 +160,7 @@ Three components:
 - **Inertia:**    m × a
 
 The payload-capacity graph converts design force back into payload mass,
-subtracting the gantry and extra moving-part mass. Its right axis shows the
+subtracting the selected gantry plate mass. Its right axis shows the
 corresponding force in newtons.
 
 ---
@@ -195,25 +195,43 @@ The crossover is the maximum usable speed.
 
 ---
 
-## 8. Mechanical Checks
+## 8. Gantry Plate Checks
 
-The calculator also applies independent checks for the selected gantry plate:
+Published gantry ratings already include the complete wheel arrangement and
+the website's safety factor of 3. Wheel-level ratings are therefore not added
+or multiplied in the calculator.
+
+Each `gantryplates.json` entry retains both values for audit:
+
+```text
+published rating = value displayed on ooznest.co.uk
+actual rating    = published rating × 3
+usable rating    = actual rating / selected user FOS
+```
+
+The selected **Plate direction** chooses the bearing-load direction:
+
+```text
+vertical plate   → radial (Cy) static plate rating
+horizontal plate → axial  (Cz) static plate rating at the selected rail width
+
+plateDemand = movingMass × (g + acceleration / 1000)
+platePass   = plateDemand ≤ usable plate rating
+```
+
+Axial `Cz` values vary with rail width, so the calculator exposes the widths
+published for the selected plate rather than guessing one. The supplied moment
+ratings are also restored from the website's FOS 3 and divided by the selected
+user FOS:
 
 ```text
 M_payload = payload × (g + acceleration / 1000) × (offset / 1000)
-M_limit = min(My, Mz)
-
-wheelDemand = movingMass × (g + acceleration / 1000)
-wheelLimit = wheelCount × wheelStatic
+M_limit = min(actual My, actual Mz) / selected user FOS
 ```
 
-Acceleration is entered in mm/s² and offset in mm; the resulting moment is Nm
-and wheel demand is N. The gantry ratings are static reference values, so these
-checks are screening checks rather than a dynamic structural certification.
-
-These are screening checks. The moment calculation uses the payload offset
-only; the wheel check conservatively applies the total moving mass to the
-selected wheel set.
+These are static screening checks, not a dynamic structural certification.
+The moment check remains deliberately conservative until its load direction is
+modelled separately.
 
 ## Known Limitations
 
@@ -252,9 +270,6 @@ power-supply voltage.
 
 | Motor | Holding torque (kg-cm) | Rated current (A) | Resistance/phase (Ω) | Inductance/phase (mH) | Nominal phase V | Steps/rev |
 |---|---:|---:|---:|---:|---:|---:|
-| NEMA14 · 25 oz-in | 1.8 | 1.00 | 2.70 | 4.0 | 2.70 | 200 |
-| NEMA14 · 52 oz-in | 3.7 | 1.68 | 1.65 | 2.3 | 2.77 | 200 |
-| NEMA14 · 57 oz-in | 4.1 | 1.50 | 2.80 | 3.8 | 4.20 | 200 |
 | NEMA17 · 21 oz-in | 1.5 | 1.40 | 1.90 | 2.0 | 2.66 | 200 |
 | NEMA17 · 35 oz-in · 0.9° | 2.5 | 1.33 | 2.10 | 2.5 | 2.79 | 400 |
 | NEMA17 · 44 oz-in | 3.2 | 1.33 | 2.10 | 2.5 | 2.79 | 200 |
@@ -280,19 +295,19 @@ power-supply voltage.
 
 ### Gantry plates
 
-| ID | Gantry plate | Mass (kg) | Wheel type | My (Nm) | Mz (Nm) | Wheel static rating (N/wheel) |
-|---|---|---:|---|---:|---:|---:|
-| `cbeam-medium` | Medium C-Beam · 77.5×77.5 mm | 0.083 | Mini V-wheel | 5.338 | 4.341 | 35.59 |
-| `cbeam-large` | Large C-Beam · 75×155 mm | 0.175 | Mini V-wheel | 12.233 | 9.949 | 35.59 |
-| `cbeam-xl` | Extra-large C-Beam · 125×125 mm | 0.232 | Regular V-wheel | 36.396 | 7.729 | 144.71 |
-| `vslot-xs` | Extra-small V-Slot · 50×50 mm | 0.036 | Mini V-wheel | 2.669 | 2.171 | 35.59 |
-| `vslot-small` | Small V-Slot · 65×65 mm | 0.029 | Regular V-wheel | 14.471 | 2.894 | 144.71 |
-| `vslot-medium` | Medium V-Slot · 100×88 mm | 0.058 | Regular V-wheel | 21.939 | 4.388 | 144.71 |
-| `vslot-large` | Large V-Slot · 127×88 mm | 0.073 | Regular V-wheel | 21.939 | 4.388 | 144.71 |
+The data source stores original website values and recovered values separately.
+The table shows original static radial (`Cy`) capacity and recovered static
+capacity before the calculator applies the selected FOS.
 
-The gantry moment and wheel ratings are treated as already factored and are
-not divided by the user FOS. Wheel ratings are per wheel; the calculator
-assumes four wheels and sums the published per-wheel ratings.
+| ID | Gantry plate | Mass (kg) | Published Cy static (N) | Recovered Cy static (N) | Published My / Mz (Nm) |
+|---|---|---:|---:|---:|---:|
+| `cbeam-medium` | Medium C-Beam · 77.5×77.5 mm | 0.083 | 35.59 | 106.77 | 5.338 / 4.341 |
+| `cbeam-large` | Large C-Beam · 75×155 mm | 0.175 | 35.59 | 106.77 | 12.233 / 9.949 |
+| `cbeam-xl` | Extra-large C-Beam · 125×125 mm | 0.232 | 144.71 | 434.13 | 36.396 / 7.729 |
+| `vslot-xs` | Extra-small V-Slot · 50×50 mm | 0.036 | 35.59 | 106.77 | 2.669 / 2.171 |
+| `vslot-small` | Small V-Slot · 65×65 mm | 0.029 | 144.71 | 434.13 | 14.471 / 2.894 |
+| `vslot-medium` | Medium V-Slot · 100×88 mm | 0.058 | 144.71 | 434.13 | 21.939 / 4.388 |
+| `vslot-large` | Large V-Slot · 127×88 mm | 0.073 | 144.71 | 434.13 | 21.939 / 4.388 |
 
 ## Data and Tunable Constants
 

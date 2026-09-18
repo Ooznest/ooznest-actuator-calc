@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Actuator Calculator — System Flow</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+  <style>
+    *{box-sizing:border-box} html,body{width:100%;height:100%;margin:0;overflow:hidden;background:#0d1117;color:#e6edf3;font-family:system-ui,-apple-system,sans-serif}
+    #sidebar{position:fixed;z-index:10;top:0;left:0;width:320px;height:100%;overflow-y:auto;padding:16px;background:#161b22;border-right:1px solid #30363d;transition:transform .25s ease}
+    #sidebar.closed{transform:translateX(-100%)} #sidebar h1{margin:0 0 16px;padding-bottom:12px;border-bottom:1px solid #30363d;color:#58a6ff;font-size:16px;line-height:1.35} #sidebar h1 small{font-size:11px;font-weight:400;color:#8b949e}
+    #sidebar h2{margin:18px 0 6px;font-size:11px;letter-spacing:.05em;color:#8b949e;text-transform:uppercase} #sidebar a{display:block;padding:6px 8px;border-radius:4px;color:#c9d1d9;font-size:13px;text-decoration:none;cursor:pointer} #sidebar a:hover,#sidebar a.active{background:#21262d;color:#58a6ff} .tag{display:inline-block;margin-right:5px;padding:1px 4px;border-radius:3px;background:#1f6feb22;color:#58a6ff;font:10px monospace}
+    #burger{position:fixed;z-index:20;top:12px;left:12px;width:40px;height:40px;border:1px solid #30363d;border-radius:8px;background:#161b22;color:#c9d1d9;font-size:20px;cursor:pointer} #toolbar{position:fixed;z-index:20;top:12px;right:12px;display:flex;gap:6px} #toolbar button{padding:6px 12px;border:1px solid #30363d;border-radius:6px;background:#161b22;color:#c9d1d9;font-size:12px;cursor:pointer} #toolbar button:hover,#burger:hover{background:#21262d}
+    #viewer{position:fixed;inset:0} .mermaid-container{position:absolute;inset:0;overflow:hidden;background:#fff;cursor:grab}.mermaid-container:active{cursor:grabbing}.mermaid-container svg{display:block;width:100%!important;height:100%!important}
+    #diagram-title{position:fixed;z-index:20;bottom:16px;left:50%;transform:translateX(-50%);padding:6px 16px;border:1px solid #30363d;border-radius:8px;background:#161b22dd;color:#8b949e;font-size:12px;white-space:nowrap} #empty{position:fixed;inset:0;display:grid;place-content:center;gap:10px;text-align:center;color:#8b949e} #empty strong{font-size:28px;color:#58a6ff}
+    @media(max-width:640px){#sidebar{width:100%}#toolbar{top:60px;right:8px}}
+  </style>
+</head>
+<body>
+  <button id="burger" onclick="toggleSidebar()" aria-label="Toggle diagram list">☰</button>
+  <nav id="sidebar">
+    <h1>Actuator Calculator<br><small>Application, source data &amp; formula maps</small></h1>
+    <h2>Application</h2>
+    <a onclick="loadDiagram(0)"><span class="tag">00</span> Full application flow</a>
+    <a onclick="loadDiagram(1)"><span class="tag">01</span> Host page &amp; iframe parameters</a>
+    <a onclick="loadDiagram(2)"><span class="tag">02</span> Startup, JSON &amp; state</a>
+    <h2>Engineering model</h2>
+    <a onclick="loadDiagram(3)"><span class="tag">03</span> Motor speed / torque / drive force</a>
+    <a onclick="loadDiagram(4)"><span class="tag">04</span> Required force &amp; payload capacity</a>
+    <a onclick="loadDiagram(5)"><span class="tag">05</span> Limits, pass/fail &amp; safety factor</a>
+    <h2>Customer outputs</h2>
+    <a onclick="loadDiagram(6)"><span class="tag">06</span> Payload / speed chart</a>
+    <a onclick="loadDiagram(7)"><span class="tag">07</span> Motion profile &amp; constant-speed travel</a>
+    <h2>Audit &amp; next work</h2>
+    <a onclick="loadDiagram(8)"><span class="tag">08</span> Plate / wheel rating audit</a>
+    <a onclick="loadDiagram(9)"><span class="tag">09</span> Compatibility and integration roadmap</a>
+    <a href="audit.html"><span class="tag">↗</span> Data-source audit pages</a>
+  </nav>
+  <div id="toolbar"><button onclick="fitView()">≪ Fit</button><button onclick="resetView()">⟳ Reset</button></div>
+  <main id="viewer"></main>
+  <div id="diagram-title"></div>
+  <div id="empty"><strong>☰</strong><span>Select a diagram to view it fullscreen.</span><small>Scroll to zoom · drag to pan</small></div>
+  <script>
+    mermaid.initialize({startOnLoad:false,theme:'base',securityLevel:'loose',themeVariables:{fontFamily:'system-ui, sans-serif',background:'#fff',primaryColor:'#ddf4ff',primaryTextColor:'#1f2328',primaryBorderColor:'#54aeff',lineColor:'#0969da',secondaryColor:'#f6f8fa',tertiaryColor:'#fff8c5',clusterBkg:'#f6f8fa',clusterBorder:'#d0d7de',nodeBorder:'#d0d7de',nodeTextColor:'#1f2328',edgeLabelBackground:'#fff'}});
+    const names=['00 — Full application flow','01 — Host page and iframe parameters','02 — Startup, data sources and state','03 — Motor speed, torque and drive force','04 — Required force and payload capacity','05 — Limits, pass/fail and safety factor','06 — Payload / speed chart','07 — Motion profile and travel','08 — Plate and wheel rating audit','09 — Compatibility and integration roadmap'];
+    const defs=[
+`flowchart TB
+  Host["Hosted index.html<br/>iframe preview / resource-page pattern"] --> Controls["External controls<br/>Actuator + Gantry plate"]
+  Controls --> URL["Build calc.html URL<br/>actuator + gantry + defaults"]
+  URL --> Calc["calc.html<br/>customer calculator"]
+  Calc --> JS["index.js<br/>load data, calculate, render"]
+  JS --> Data["motors.json<br/>transmission.json<br/>gantryplates.json"]
+  JS --> Input["Motor · orientation · payload · speed<br/>FOS + More configuration"]
+  Input --> Model["Capacity + requirement + limits"]
+  Data --> Model
+  Model --> Cards["Speed · motor torque · moment · wheels / plate<br/>PASS / FAIL"]
+  Model --> Graphs["Speed over travel<br/>Maximum payload at speed"]
+  Model --> URLState["history.replaceState<br/>shareable query parameters"]
+`,
+`flowchart LR
+  Resource["Resource / product page"] --> Embed["iframe src<br/>calc.html?v=…&amp;actuator=…&amp;gantry=…"]
+  subgraph HostPage["index.html preview / future host page"]
+    A["Actuator select<br/>from transmission.json"] --> P["URLSearchParams"]
+    G["Gantry select<br/>from gantryplates.json"] --> P
+    P --> Frame["frame.src = calc.html?…"]
+    Frame --> LiveURL["Read-only injected URL field"]
+  end
+  Resource --> HostPage
+  Frame --> IFrame["calc.html"]
+  IFrame --> State["Read query parameters<br/>set matching form values"]
+  Note["Cache-busters: calc HTML, index.js<br/>and JSON responses"] -.-> Frame
+`,
+`flowchart TB
+  Start["calc.html loads"] --> Assets["index.js?v=…"]
+  Assets --> Fetch["Fetch JSON with cache:'no-store'<br/>? v=cacheVersion"]
+  Fetch --> Motors["motors.json<br/>frame, torque, current, resistance, inductance, steps"]
+  Fetch --> Drives["transmission.json<br/>type, lead, efficiency, friction, max travel"]
+  Fetch --> Gantries["gantryplates.json<br/>mass, Cy / wheel data, My, Mz, wheel count"]
+  Motors --> Populate["Populate hidden / visible selects"]
+  Drives --> Populate
+  Gantries --> Populate
+  Populate --> Query["Apply URL query values<br/>Default motor NEMA23 345 oz-in<br/>Default gantry Large C-Beam"]
+  Query --> Data["data()<br/>selected motor + actuator + gantry<br/>inputs + total moving mass"]
+  Data --> Update["update() on form input / change"]
+  Update --> Persist["replaceState query string"]
+  Update --> Render["Cards · labels · SVG charts"]
+  Fetch -. failure .-> Error["Display data-load error"]
+`,
+`flowchart TB
+  subgraph Inputs["Selected motor and drive"]
+    M["Motor<br/>T_hold kg-cm, I_rated, R, L"]
+    D["Actuator<br/>type screw / belt<br/>lead mm/rev, η"]
+    I["Driver current I<br/>24 V TB67S109 assumption"]
+    S["Requested speed v mm/min"]
+    F["User FOS"]
+  end
+  M --> H["Voltage headroom<br/>max(0.4, (24 - I×R) / (24 - 1.25×1.2))"]
+  H --> N0["No-load rpm<br/>(5500/8) × sqrt(4/L) × sqrt(headroom) × max(0.5,I/1.25)^0.15"]
+  S --> RPM["rpm = v / lead"]
+  M --> T0["Holding torque<br/>T_hold × 0.0980665 N·m"]
+  I --> CR["Current ratio<br/>min(1, I / I_rated)"]
+  RPM --> Drop["Speed fraction<br/>max(0, 1 - (rpm / noLoadRpm)^exponent)"]
+  N0 --> Drop
+  T0 --> Torque["Running torque<br/>T_hold × current ratio × fraction × derate"]
+  CR --> Torque
+  Drop --> Torque
+  D --> Force["Raw drive force<br/>Screw: T×η×2π / lead(m)<br/>Belt: T×η / (lead(m)/2π)"]
+  Torque --> Force
+  F --> Safe["Available force<br/>raw force / FOS"]
+  Force --> Safe
+  Ref["Reference only: NEMA23 345 oz-in + screw<br/>measured-reference exponent 2.2, derate 1<br/>Other combinations: exponent 1.65, derate 0.75"] -.-> Drop
+`,
+`flowchart TB
+  subgraph Inputs["Mass and motion inputs"]
+    Load["Payload kg"]
+    Parts["Extra moving parts kg"]
+    Plate["Gantry plate mass kg"]
+    O["Orientation<br/>vertical / horizontal / inclined θ"]
+    A["Acceleration a mm/s²"]
+    D["Actuator friction μ"]
+  end
+  Load --> Mass["moving mass m<br/>payload + parts + plate"]
+  Parts --> Mass
+  Plate --> Mass
+  O --> Theta["θ = 90° vertical<br/>0° horizontal<br/>entered incline otherwise"]
+  Mass --> G["Gravity<br/>m × 9.80665 × sin θ"]
+  Theta --> G
+  Mass --> Fric["Friction<br/>m × 9.80665 × μ × cos θ"]
+  Theta --> Fric
+  D --> Fric
+  Mass --> Accel["Acceleration force<br/>m × a/1000"]
+  A --> Accel
+  G --> Need["Required drive force<br/>gravity + friction + acceleration"]
+  Fric --> Need
+  Accel --> Need
+  Safe["Available safe drive force"] --> Margin["Force margin<br/>available - required"]
+  Need --> Margin
+  Safe --> PerKg["Force per kg<br/>9.80665×sin θ + 9.80665×μ×cos θ + a/1000"]
+  O --> PerKg
+  D --> PerKg
+  A --> PerKg
+  PerKg --> Capacity["Drive payload at speed<br/>available / forcePerKg - parts - plate"]
+`,
+`flowchart TB
+  Input["Selected configuration"] --> Speed["Speed capability<br/>Binary search: max speed where<br/>available force ≥ required force"]
+  Input --> Motor["Motor torque<br/>PASS when force margin ≥ 0"]
+  Input --> Moment["Moment load<br/>M = payload × (9.80665+a/1000) × offset(m)"]
+  Input --> Wheels["Wheel / plate load<br/>Current demand = moving mass × (9.80665+a/1000)"]
+  Input --> Travel["Travel limit<br/>requested travel ≤ actuator maxTravel"]
+  Speed --> Status["Overall recommendation"]
+  Motor --> Status
+  Moment --> Status
+  Wheels --> Status
+  Travel --> Status
+  Status --> Fail["Any failed check / travel limit<br/>Not recommended"]
+  Status --> Warn["Margin below 20%<br/>Low margin: validate physically"]
+  Status --> Pass["Otherwise<br/>Within conservative drive envelope"]
+  Current["CURRENT RATING FLOW<br/>Website plate ratings include FOS 3 and wheel assembly.<br/>Data stores published and recovered actual (×3).<br/>Calculator divides recovered plate / moment values by user FOS."] -.-> Moment
+  Current -.-> Wheels
+`,
+`flowchart LR
+  D["Current data + user inputs"] --> Sample["33 speeds<br/>0 → graph maximum"]
+  Sample --> Force["capacity(d, speed)<br/>speed-dependent drive force"]
+  Force --> DriveMass["Drive payload<br/>safe force / force-per-kg − components"]
+  D --> PlateMass["Plate / wheel payload<br/>current implementation derives separate cap"]
+  DriveMass --> Min["Maximum payload curve<br/>min(drive payload, plate / wheel payload)<br/>clamped ≥ 0"]
+  PlateMass --> Min
+  D --> Demand["Red horizontal line<br/>requested payload"]
+  Min --> Blue["Blue curve<br/>Maximum Payload at Speed"]
+  Demand --> Red["Red line<br/>Maximum Speed with Payload"]
+  Blue --> Select["At requested speed<br/>blue point / max payload"]
+  Red --> Cross["Binary-search crossing<br/>max speed for requested payload"]
+  Select --> SVG["SVG labels<br/>kg + N equivalent"]
+  Cross --> SVG
+  Audit["Graph uses recovered plate-assembly capacity / user FOS<br/>and never multiplies a plate rating by wheel count."] -.-> PlateMass
+`,
+`flowchart TB
+  Inputs["Travel x mm<br/>Requested speed V mm/min<br/>Acceleration A mm/s²"] --> Convert["v = V / 60 mm/s"]
+  Convert --> Ramp["Required ramp distance<br/>v² / A"]
+  Ramp --> Shape{"ramp distance > travel?"}
+  Shape -->|Yes| Triangle["Triangular profile<br/>peak v = sqrt(A × travel)<br/>no constant-speed segment"]
+  Shape -->|No| Trapezoid["Trapezoidal profile<br/>ramp distance = v² / 2A<br/>cruise = travel - 2×ramp distance"]
+  Triangle --> Time["Move time<br/>2×peak/A"]
+  Trapezoid --> Time2["Move time<br/>2×v/A + cruise/v"]
+  Triangle --> Plot["SVG speed-over-travel plot"]
+  Trapezoid --> Plot
+  Time --> Note["Customer output<br/>requested speed cannot be reached<br/>within selected travel"]
+  Time2 --> Note2["Customer output<br/>constant-speed travel and move time"]
+`,
+`flowchart TB
+  Published["Published Extra Small V-Slot plate ratings<br/>Cy static 35.59 N<br/>My 2.669 Nm · Mz 2.171 Nm"] --> Meaning["Cy is a plate / gantry assembly rating<br/>for the shown load direction"]
+  Wheel["One Mini V-Slot wheel<br/>static radial 14.49 N"] --> WheelTotal["Four individual wheels<br/>4 × 14.49 = 57.96 N"]
+  Meaning --> Governs["Governing static load<br/>min(plate Cy 35.59, wheel aggregate 57.96)<br/>= 35.59 N"]
+  WheelTotal --> Governs
+  Bad["PREVIOUS UI 55 / 71 N<br/>Demand: (5 + 0.5 + 0.036) kg × (g + 0.1) = 54.8 N<br/>Limit: 4 × 35.59 / FOS 2 = 71.2 N"] --> Error["Incorrect: treated whole-plate Cy as per-wheel<br/>and retained the published FOS"]
+  Error --> Correct["CURRENT comparison for FOS 2<br/>Recovered Cy 106.77 / 2 = 53.4 N<br/>54.8 N / 53.4 N = FAIL"]
+  Published --> Moment["Published My / Mz also need direct comparison<br/>not division by calculator drive FOS"]
+  Correct --> Required["Current data model<br/>Store published and recovered plate values separately<br/>Select radial / axial direction and rail width"]
+  Moment --> Required
+`,
+`flowchart TB
+  Current["Current calculator<br/>independent actuator + motor + gantry controls"] --> Compatible["Add compatibility matrix"]
+  Compatible --> Actuator["Actuator family<br/>7 supported product names"]
+  Actuator --> Gantry["Only compatible gantry plates<br/>V-Slot families vs C-Beam families"]
+  Actuator --> Motor["Only compatible motor frames / mounts<br/>prevent invalid NEMA defaults"]
+  Gantry --> Defaults["Host page injects valid defaults<br/>iframe remains editable"]
+  Motor --> Defaults
+  Defaults --> URL["Stable URL contract<br/>actuator, gantry, motor, travel<br/>orientation, load, speed, accel, FOS"]
+  URL --> Resources["Resource pages / product pages<br/>embed a preconfigured calculator"]
+  Current --> Safety["Add engineering scope notice<br/>Beam / extrusion deflection not calculated<br/>Validate structure, mounting, thermal duty and physical stall test"]
+  Current --> Ratings["Correct rating architecture<br/>Drive: user FOS<br/>Published gantry / plate ratings: no extra FOS<br/>Wheel data: source-specific treatment"]
+`
+    ];
+    let instance=null,sidebarOpen=true;
+    function toggleSidebar(){sidebarOpen=!sidebarOpen;document.getElementById('sidebar').classList.toggle('closed',!sidebarOpen)}
+    function fitView(){if(instance)instance.fit()} function resetView(){if(instance)instance.reset()}
+    async function loadDiagram(index){document.querySelectorAll('#sidebar a').forEach(a=>a.classList.remove('active'));document.querySelectorAll('#sidebar a')[index].classList.add('active');document.getElementById('empty').style.display='none';document.getElementById('diagram-title').textContent=names[index];if(instance){try{instance.destroy()}catch(e){}}const viewer=document.getElementById('viewer');viewer.innerHTML='<div class="mermaid-container" id="mermaid-view"></div>';const target=document.getElementById('mermaid-view');try{const result=await mermaid.render(`diagram-${index}-${Date.now()}`,defs[index]);target.innerHTML=result.svg;const svg=target.querySelector('svg');instance=svgPanZoom(svg,{zoomEnabled:true,controlIconsEnabled:false,fit:true,center:true,minZoom:.15,maxZoom:5})}catch(error){target.innerHTML=`<pre style="padding:24px;white-space:pre-wrap;color:#cf222e">${error.message}</pre>`}if(window.innerWidth<=640){sidebarOpen=false;document.getElementById('sidebar').classList.add('closed')}}
+  </script>
+</body>
+</html>
