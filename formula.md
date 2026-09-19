@@ -285,13 +285,13 @@ power-supply voltage.
 
 ### Drive systems (actuators)
 
-| ID | Drive | Type | Travel/rev (mm) | Efficiency | Friction coefficient | Listed max travel (mm) |
-|---|---|---|---:|---:|---:|---:|
-| `cbeam-screw` | C-Beam TR8×8 lead screw | Screw | 8 | 0.42 | 0.050 | 1,000 |
-| `nema23-screw` | TR8×8 lead screw | Screw | 8 | 0.42 | 0.050 | 1,500 |
-| `nema17-screw` | Compact TR8×8 lead screw | Screw | 8 | 0.38 | 0.050 | 1,000 |
-| `belt-gt2-30t` | GT2 / 30-tooth pulley | Belt | 60 | 0.95 | 0.035 | 2,000 |
-| `belt-gt3-20t` | GT3 / 20-tooth pulley | Belt | 60 | 0.95 | 0.035 | 2,000 |
+| ID | Drive | Type | Travel/rev (mm) | Efficiency | Friction coefficient |
+|---|---|---|---:|---:|---:|
+| `cbeam-screw` | C-Beam TR8×8 lead screw | Screw | 8 | 0.42 | 0.050 |
+| `nema23-screw` | TR8×8 lead screw | Screw | 8 | 0.42 | 0.050 |
+| `nema17-screw` | Compact TR8×8 lead screw | Screw | 8 | 0.38 | 0.050 |
+| `belt-gt2-30t` | GT2 / 30-tooth pulley | Belt | 60 | 0.95 | 0.035 |
+| `belt-gt3-20t` | GT3 / 20-tooth pulley | Belt | 60 | 0.95 | 0.035 |
 
 ### Gantry plates
 

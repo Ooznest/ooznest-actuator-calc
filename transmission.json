@@ -1,9 +1,9 @@
 [
-  {"id":"belt-gt2-30t","name":"Modular Belt Drive Actuator","type":"belt","lead":60,"efficiency":0.95,"maxTravel":2000,"friction":0.035,"note":"60 mm/rev theoretical belt travel; belt tension and plate stiffness must be verified."},
-  {"id":"belt-gt3-20t","name":"Belt Drive Actuator","type":"belt","lead":60,"efficiency":0.95,"maxTravel":2000,"friction":0.035,"note":"60 mm/rev theoretical belt travel; belt tension and plate stiffness must be verified."},
-  {"id":"nema23-screw","name":"Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"maxTravel":1500,"friction":0.05,"note":"8 mm/rev screw model. Validate screw whip and back-drive for final length."},
-  {"id":"cbeam-screw","name":"C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"maxTravel":1000,"friction":0.05,"note":"8 mm/rev screw; 250–1,000 mm listed kit range. Back-drive possible."},
-  {"id":"cbeam-rear-screw","name":"Rear Mount C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"maxTravel":1000,"friction":0.05,"note":"8 mm/rev rear-mount screw; 250–1,000 mm listed kit range. Back-drive possible."},
-  {"id":"nema17-screw","name":"Compact C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.38,"maxTravel":1000,"friction":0.05,"note":"8 mm/rev screw model. Validate physical motor-mount compatibility."},
-  {"id":"nema17-rear-screw","name":"Rear Mount Compact C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.38,"maxTravel":1000,"friction":0.05,"note":"8 mm/rev rear-mount screw model. Validate physical motor-mount compatibility."}
+  {"id":"belt-gt2-30t","name":"Modular Belt Drive Actuator","type":"belt","lead":60,"efficiency":0.95,"friction":0.035},
+  {"id":"belt-gt3-20t","name":"Belt Drive Actuator","type":"belt","lead":60,"efficiency":0.95,"friction":0.035},
+  {"id":"nema23-screw","name":"Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"friction":0.05},
+  {"id":"cbeam-screw","name":"C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"friction":0.05},
+  {"id":"cbeam-rear-screw","name":"Rear Mount C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"friction":0.05},
+  {"id":"nema17-screw","name":"Compact C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.38,"friction":0.05},
+  {"id":"nema17-rear-screw","name":"Rear Mount Compact C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.38,"friction":0.05}
 ]
