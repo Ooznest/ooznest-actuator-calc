@@ -1,0 +1,11 @@
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#172b4d;background:#f6f7f9}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1240px;margin:auto;padding:32px 22px 56px}
+header{margin-bottom:0}h1{margin:0;color:#062f63;font-size:28px}h2{margin:30px 0 12px;color:#062f63;font-size:21px}p{line-height:1.5}.muted{color:#5f6b7a}
+
+.topbar{display:flex;align-items:center;gap:6px;padding:0 0 12px;margin-bottom:0;border-bottom:1px solid #d8dee8}.topbar a{color:#062f63;text-decoration:none;font-size:12px;font-weight:600;padding:4px 8px;border:1px solid #b9c6d8;border-radius:4px;background:#fff;transition:background .12s,border-color .12s}.topbar a:hover{background:#eef3f8;border-color:#062f63}.topbar .sep{color:#b9c6d8;font-size:11px}
+
+.tabs{display:flex;flex-wrap:wrap;gap:0;margin:16px 0 -1px;padding-bottom:0;border-bottom:2px solid #d8dee8}.tabs a{padding:9px 15px;color:#5f6b7a;text-decoration:none;font-weight:600;font-size:13px;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .12s,border-color .12s}.tabs a:hover{color:#062f63;border-bottom-color:#b9c6d8}.tabs a.active{color:#062f63;border-bottom-color:#062f63}
+
+.card{margin:14px 0;padding:17px 19px;border:1px solid #d8dee8;border-radius:8px;background:#fff;box-shadow:0 1px 2px #001b4420}.warning{border-left:4px solid #e6a700;background:#fff9e8}.issue{border-left:4px solid #c52a2a;background:#fff3f3}.ok{border-left:4px solid #22863a;background:#f1fff5}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.label{display:block;color:#5f6b7a;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.04em}.value{margin-top:5px;font-size:16px;font-weight:600}
+table{width:100%;border-collapse:collapse;background:#fff;font-size:13px}th,td{padding:10px;border:1px solid #d8dee8;text-align:left;vertical-align:top}th{background:#eaf1f8;color:#062f63}code{padding:2px 4px;background:#edf1f5;border-radius:3px;font-size:.92em}.source{font-size:13px;color:#384b63}.footer{margin-top:28px;font-size:12px;color:#5f6b7a}
+@media(max-width:680px){.wrap{padding:20px 12px}table{font-size:11px}th,td{padding:7px}.tabs a{padding:7px 10px;font-size:12px}}

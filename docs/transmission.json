@@ -1,0 +1,9 @@
+[
+  {"id":"belt-gt2-30t","name":"Modular Belt Drive Actuator","type":"belt","lead":60,"efficiency":0.95,"friction":0.035},
+  {"id":"belt-gt3-20t","name":"Belt Drive Actuator","type":"belt","lead":60,"efficiency":0.95,"friction":0.035},
+  {"id":"nema23-screw","name":"Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"friction":0.05},
+  {"id":"cbeam-screw","name":"C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"friction":0.05},
+  {"id":"cbeam-rear-screw","name":"Rear Mount C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.42,"friction":0.05},
+  {"id":"nema17-screw","name":"Compact C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.38,"friction":0.05},
+  {"id":"nema17-rear-screw","name":"Rear Mount Compact C-Beam Screw Drive Actuator","type":"screw","lead":8,"efficiency":0.38,"friction":0.05}
+]
