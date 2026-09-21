@@ -40,7 +40,7 @@
     const skuSelect = document.getElementById('skuSelect');
     fetch(`sku-source.json?v=${Date.now()}`, {cache: 'no-store'})
       .then(response => response.json())
-      .then(source => source.skus.forEach(sku => skuSelect.add(new Option(`${sku} — ${source.displayNames[sku] || 'No display name'}`, sku))))
+      .then(source => Object.values(source.products || {}).forEach(product => skuSelect.add(new Option(`${product.sku} — ${product.displayName || 'No display name'}`, product.sku))))
       .catch(() => skuSelect.innerHTML = '<option value="">Unable to load SKU source</option>');
     skuSelect.addEventListener('change', () => {
       if (!skuSelect.value) return;

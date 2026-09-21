@@ -8,8 +8,9 @@
   const fmt = (n, decimals = 0) => Number.isFinite(n) ? n.toLocaleString(undefined, {maximumFractionDigits:decimals}) : '—';
   const populate = (id, data) => $(id).innerHTML = data.map(item => `<option value="${item.id}">${item.name}</option>`).join('');
   const sku = params.get('sku')?.trim().toUpperCase();
+  const skuDefaults = sku && skuSource.products?.[sku]?.defaults;
   const plateId = value => ({L:'large',M:'medium',S:'small',XS:'xs',XL:'xl'}[value] || value.toLowerCase());
-  const skuRecord = sku && (() => {
+  const skuRecord = sku && (skuSource.products?.[sku] || (() => {
     const parts = sku.split('-'), prefix = parts[0], plate = plateId(parts[parts.length - 1]);
     if (prefix === 'CSDA') return {status:'unsupported', reason:'Accessory or non-calculator SKU.'};
     if (prefix === 'CBSDA') return {status:'supported', params:{actuator:'cbeam-screw', motor:'nema23-345-300', gantry:`cbeam-${plate}`, travel:Number(parts[1]), railWidth:80, plateDirection:'vertical'}};
@@ -17,12 +18,13 @@
     if (prefix === 'BDA') return {status:'supported', params:{actuator:'belt-gt2-30t', motor:parts[1] === 'NEMA17' ? 'nema17-77-168' : 'nema23-345-300', gantry:`vslot-${plate}`, travel:Number(parts[3]), railWidth:Number(parts[2].slice(2)), plateDirection:'vertical'}};
     if (prefix === 'MBDA') return {status:'supported', params:{actuator:'belt-gt3-20t', motor:'nema23-345-300', gantry:`vslot-${plate}`, travel:Number(parts[2]), railWidth:Number(parts[1].slice(2)), plateDirection:'vertical'}};
     return undefined;
-  })();
+  })());
   if (sku && !skuRecord) throw new Error(`Unknown calculator SKU: ${sku}`);
   populate('motor', motors); populate('actuator', actuators); populate('gantry', gantries);
   if (sku && skuRecord?.status !== 'supported') throw new Error(`${sku}: ${skuRecord?.reason || 'This SKU is not a calculator product.'}`);
   ['actuator','motor','gantry','travel','orientation','load','offset','speed','accel','microsteps','current','fos','plateDirection','railWidth'].forEach(key => { if (params.has(key)) $(key).value = params.get(key); });
   if (skuRecord) Object.entries(skuRecord.params).forEach(([key, value]) => { $(key).value = value; });
+  if (skuDefaults) { if (!params.has('load')) $('load').value = skuDefaults.load; if (!params.has('speed')) $('speed').value = skuDefaults.speed; }
   if (!['vertical','horizontal'].includes($('orientation').value)) $('orientation').value = 'vertical';
   if (!params.has('motor') && !skuRecord) $('motor').value = 'nema23-345-300';
   if (!params.has('gantry') && !skuRecord) $('gantry').value = 'cbeam-large';
@@ -33,7 +35,7 @@
   const initialRailWidths=syncCompatibility();
   if(skuRecord?.params.railWidth && initialRailWidths.includes(Number(skuRecord.params.railWidth)))$('railWidth').value=String(skuRecord.params.railWidth);
   if(params.has('railWidth')&&initialRailWidths.includes(Number(params.get('railWidth'))))$('railWidth').value=params.get('railWidth');
-  const validation = (id, pass, title, detail) => { const el=$(id); el.className=`validation ${pass?'pass':'fail'}`; el.querySelector('strong').textContent=title; el.querySelector('small').textContent=detail; };
+  const validation = (id, pass, title, detail) => { const el=$(id); el.className=`validation ${pass?'pass':'fail'}`; el.querySelector('strong').textContent=title; const clearDetail=detail.replace('recovered rating / user FOS','rating / user FOS'); let displayDetail=clearDetail; if(id==='checkSpeed') displayDetail=clearDetail.replace(/^(.+) requested \/ (.+) estimated maximum$/, 'Requested: $1<br>Maximum: $2'); if(id==='checkTorque') displayDetail=clearDetail.replace(/^(.+) available vs (.+) required$/, 'Available: $1<br>Required: $2'); if(id==='checkMoment') displayDetail=clearDetail.replace(/^(.+) \/ (.+) Nm · (.+)$/, 'Required: $1<br>Available: $2 Nm<br>$3'); if(id==='checkWheels') displayDetail=clearDetail.replace(/^[^:]+: (.+) \/ (.+) N$/, 'Required: $1 N<br>Available: $2 N'); el.querySelector('small').innerHTML=displayDetail; };
   function data() { const gantry=gantries.find(item=>item.id===$('gantry').value), components=gantry.mass; return {motor:motors.find(item=>item.id===$('motor').value), actuator:actuators.find(item=>item.id===$('actuator').value), gantry, travel:numeric('travel'), orientation:$('orientation').value, plateDirection:$('plateDirection').value, railWidth:numeric('railWidth'), load:numeric('load'), components, offset:numeric('offset'), speed:numeric('speed'), accel:numeric('accel'), microsteps:numeric('microsteps'), current:numeric('current'), fos:Math.max(1,numeric('fos')), get movingMass(){return this.load+this.components;}}; }
   function capacity(d, speed) { const rpm=speed/d.actuator.lead, voltageHeadroom=Math.max(.4,(24-d.current*d.motor.resistance)/(24-1.25*1.2)); const noLoadRpm=(5500/8)*Math.sqrt(4/d.motor.inductance)*Math.sqrt(voltageHeadroom)*Math.pow(Math.max(.5,d.current/1.25),.15); const currentRatio=Math.min(1,d.current/d.motor.current), reference=d.motor.id==='nema23-345-300'&&d.actuator.type==='screw', derate=reference?1:.75, exponent=reference?2.2:1.65, fraction=Math.max(0,1-(rpm/noLoadRpm)**exponent), torqueNm=d.motor.torque*.0980665*currentRatio*fraction*derate, rawForce=d.actuator.type==='screw'?torqueNm*d.actuator.efficiency*(2*Math.PI)/(d.actuator.lead/1000):torqueNm*d.actuator.efficiency/((d.actuator.lead/1000)/(2*Math.PI)); return {force:rawForce/d.fos,rawForce,rpm,noLoadRpm,torqueNm,isMeasuredReference:reference}; }
   function perKg(d) { const theta=(d.orientation==='vertical'?90:0)*Math.PI/180; return 9.80665*Math.sin(theta)+9.80665*d.actuator.friction*Math.cos(theta)+d.accel/1000; }
