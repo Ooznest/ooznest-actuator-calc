@@ -5,22 +5,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Linear actuator calculator</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0,0&family=Nunito:wght@400;600;700&display=swap');
+
     :root { --primary:#449d9f; --ink:#2f373c; --muted:rgba(47,55,60,.68); --line:#d9e1e1; --soft:#ebefef; --good:#388e3c; --warn:#f57c00; --bad:#d32f2f; }
     * { box-sizing:border-box } body { margin:0; font:14px/1.5 Nunito,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
     main { max-width:1180px; margin:0 auto; padding:12px; } h1 { margin:0; color:var(--ink); font-size:24px; line-height:36px; font-weight:500; } h2 { color:var(--ink); font-size:20px; line-height:30px; font-weight:500; margin:16px 0 8px; } h3 { color:var(--ink); font-size:14px; font-weight:500; margin:0 0 6px; } p { margin:5px 0; }
     .intro { color:var(--muted); font-size:13px; } .grid { display:grid; grid-template-columns:1fr; gap:0; margin-top:4px; }
     .panel { border:1px solid var(--line); border-radius:8px; padding:10px; margin-bottom:8px; background:#fff; box-shadow:0 2px 5px rgba(47,55,60,.05); } #form { order:1; grid-column:1/-1; } #resultPanel { order:2; grid-column:1/-1; } #capabilitiesCard { order:3; } .inputs { display:grid; grid-template-columns:repeat(4,1fr); gap:10px 12px; }
-    label { display:block; font-size:11px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; color:rgba(0,0,0,.6); } [hidden] { display:none !important; } input,select { margin-top:3px; width:100%; height:34px; border:1px solid #bdbdbd; border-radius:5px; padding:6px 8px; font:14px Nunito,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
+    label { display:block; font-size:11px; font-weight:600; letter-spacing:0; text-transform:none; color:rgba(0,0,0,.6); } [hidden] { display:none !important; } input,select { margin-top:3px; width:100%; height:34px; border:1px solid #bdbdbd; border-radius:5px; padding:6px 8px; font:14px Nunito,Arial,sans-serif; color:rgba(0,0,0,.87); background:#fff; }
     input:focus,select:focus { outline:2px solid rgba(25,118,210,.3); border-color:var(--primary); } .full { grid-column:1/-1; } .hint { font-size:11px; line-height:1.35; color:var(--muted); margin-top:3px; } .results { display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--line); }
     .metric { display:grid; grid-template-columns:1fr auto; align-items:center; gap:5px; background:#fff; padding:4px 7px; border-left:1px solid var(--line); min-height:34px; } .metric:first-child { border-left:0; } .metric span { display:block; color:var(--muted); font-size:10px; } .metric strong { display:block; color:var(--ink); font-size:14px; font-weight:500; margin-top:0; text-align:right; }
-    .validations { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:0 0 10px; border:1px solid var(--line); } .validation { display:grid; grid-template-columns:1fr auto; grid-template-rows:auto 1fr; align-items:start; column-gap:6px; border:0; border-left:1px solid var(--line); border-radius:0; padding:5px 8px; min-height:42px; } .validation:first-child { border-left:0; } .validation span,.validation strong { align-self:start; } .validation span { display:block; color:var(--muted); font-size:10px; line-height:16px; } .validation strong { display:block; margin-top:0; font-size:13px; line-height:16px; font-weight:500; text-align:right; } .validation strong::before { font-family:'Material Symbols Outlined'; font-size:16px; line-height:16px; vertical-align:-2px; margin-right:3px; } .validation.pass { border-bottom:3px solid var(--good); background:#f1f8f2; } .validation.pass strong::before { content:'check_circle'; color:var(--good); } .validation.fail { border-bottom:3px solid var(--bad); background:#fff1f1; } .validation.fail strong::before { content:'cancel'; color:var(--bad); }
+    .validations { display:grid; grid-template-columns:repeat(4,1fr); gap:0; margin:0 0 10px; border:1px solid var(--line); } .validation { display:grid; grid-template-columns:1fr auto; grid-template-rows:auto 1fr; align-items:start; column-gap:6px; border:0; border-left:1px solid var(--line); border-radius:0; padding:5px 8px; min-height:42px; } .validation:first-child { border-left:0; } .validation span,.validation strong { align-self:start; } .validation span { display:block; color:var(--muted); font-size:10px; line-height:16px; } .validation strong { display:block; margin-top:0; font-size:13px; line-height:16px; font-weight:500; text-align:right; } .validation.pass { border-bottom:3px solid var(--good); background:#f1f8f2; } .validation.fail { border-bottom:3px solid var(--bad); background:#fff1f1; }
     .status { margin:8px 0; border-radius:0; border-left:3px solid var(--primary); padding:7px 10px; font-size:13px; font-weight:500; } .good { background:#f5f5f5; color:var(--ink); } .warn { background:#fff8e1; color:#6d4c00; } .bad { background:#ffebee; color:#b71c1c; }
     .detail { order:4; grid-column:1/-1; margin-top:10px; border-top:1px solid var(--line); padding-top:8px; color:var(--muted); font-size:11px; } .detail dl { display:grid; grid-template-columns:1fr auto; gap:3px 12px; margin:5px 0 0; } .detail dd { margin:0; font-weight:500; color:var(--ink); }
-    .chart { grid-column:1/-1; } .chartbox { height:185px; background:#fff; border:1px solid var(--line); padding:8px; } .capability-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } svg { width:100%; height:100%; overflow:visible; } .legend { display:flex; gap:12px; font-size:11px; color:var(--muted); flex-wrap:wrap; } .key { width:10px; height:10px; display:inline-block; margin-right:4px; background:var(--primary); } .key.gray { background:#757575; } .key.dashed { background:linear-gradient(90deg,#757575 55%,transparent 55%); } .key.red { background:#b42318; }
-    .notice { margin-top:12px; border-left:3px solid var(--primary); background:#f5f5f5; padding:9px 12px; font-size:11px; } details { margin-top:10px; border-top:1px solid var(--line); padding-top:8px; } summary { cursor:pointer; color:var(--ink); font-size:13px; font-weight:500; } code { background:#f5f5f5; padding:2px 4px; } @media(max-width:520px){ main{max-width:760px;padding:10px}.results,.validations{grid-template-columns:1fr 1fr}.inputs,.capability-charts{grid-template-columns:1fr}.full{grid-column:auto} } @media(min-width:521px){ .capability-charts .chartbox{height:130px} } @media(min-width:600px){ main{padding:5px} #form .inputs{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px 6px} #form .full{grid-column:1/-1} #form .hint{display:none} #form input,#form select{height:27px;padding:3px 6px;font-size:12px} #form label{font-size:9px} #form details{margin-top:5px;padding-top:4px} #capabilitiesCard .capability-charts{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px} #capabilitiesCard .chartbox{height:92px;padding:4px} #capabilitiesCard h2{font-size:15px;line-height:20px;margin:5px 0 3px} #capabilitiesCard h3{font-size:11px;margin:0 0 2px} #capabilitiesCard .legend{font-size:9px} #resultPanel .status{margin:3px 0;padding:3px 6px;font-size:10px} #resultPanel .validations{margin-bottom:3px} #resultPanel .results{display:none} }
+    .chart { grid-column:1/-1; } .chartbox { height:185px; background:#fff; border:1px solid var(--line); padding:8px; } .capability-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } svg { width:100%; height:100%; overflow:visible; } .legend { display:flex; gap:12px; font-size:11px; color:var(--muted); flex-wrap:wrap; } .key { width:10px; height:10px; display:inline-block; margin-right:4px; background:var(--primary); } .key.gray { background:#757575; } .key.dashed { background:linear-gradient(90deg,#757575 55%,transparent 55%); } .key.red { background:#FF6600; }
+    .notice { margin-top:12px; border:2px solid #FFC43A; border-radius:8px; background:#FFF3D8; padding:9px 12px; font-size:11px; } details { margin-top:6px; padding-top:0; } summary { cursor:pointer; color:var(--ink); font-size:13px; font-weight:500; } code { background:#f5f5f5; padding:2px 4px; } @media(max-width:520px){ main{max-width:760px;padding:10px}.results,.validations{grid-template-columns:1fr 1fr}.inputs,.capability-charts{grid-template-columns:1fr}.full{grid-column:auto} } @media(min-width:521px){ .capability-charts .chartbox{height:130px} } @media(min-width:600px){ main{padding:5px} #form .inputs{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px 6px} #form .full{grid-column:1/-1} #form .hint{display:none} #form input,#form select{height:27px;padding:3px 6px;font-size:12px} #form label{font-size:9px} #form details{margin-top:5px;padding-top:4px} #capabilitiesCard .capability-charts{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px} #capabilitiesCard .chartbox{height:92px;padding:4px} #capabilitiesCard h2{font-size:15px;line-height:20px;margin:5px 0 3px} #capabilitiesCard h3{font-size:11px;margin:0 0 2px} #capabilitiesCard .legend{font-size:9px} #resultPanel .status{margin:3px 0;padding:3px 6px;font-size:10px} #resultPanel .validations{margin-bottom:3px} #resultPanel .results{display:none} }
     @media (min-width:600px) { .detail { display:none; } #capabilitiesCard > p.hint, #profileNote, main > p.hint { display:none; } #capabilitiesCard .chartbox { height:165px; } #form .inputs { grid-template-columns:repeat(6,minmax(0,1fr)); } #form .span-3 { grid-column:span 3; } #resultPanel .status { display:none; } }
     #resultPanel h2 { margin:0 0 3px; color:var(--primary); font-size:14px; line-height:20px; }
+    #form.panel { border:0; padding:0; background:transparent; box-shadow:none; }
     .setting-groups { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px 12px; }
     .setting-group { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px 6px; }
     .setting-group:first-child { grid-column:1/-1; }
@@ -30,30 +31,44 @@
     .requirements-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 6px; }
     .requirements .primary-requirement { color:var(--ink); font-weight:700; }
     .requirements .primary-requirement input { background:#ebefef; border-color:#449d9f; }
-    .material-symbols-outlined { display:inline-block; font-size:15px; line-height:1; vertical-align:-3px; margin-right:3px; color:#667276; }
-    @media (min-width:600px) { #form .material-symbols-outlined { font-size:14px; } }
+
+
     @media (min-width:600px) { #form details .inputs { grid-template-columns:repeat(3,minmax(0,1fr)); } #form .setting-group h3 { font-size:10px; } }
     @media (max-width:520px) { .setting-groups,.setting-group { grid-template-columns:1fr; } }
+    .form-section { border:1px solid var(--line); border-radius:8px; padding:8px; margin-bottom:8px; background:#fff; }
+    .form-section h2 { margin:0 0 6px; color:var(--primary); font-size:14px; line-height:20px; }
+    .actuator-section .inputs { gap:6px 12px; }
+    .actuator-section .setting-groups { margin-top:2px; }
+    /* Match the shared Ooznest form controls. */
+    #form label { color:#449d9f; font-size:12px; font-weight:600; line-height:20px; }
+    #form input,#form select { min-height:40px; height:40px; padding:8px 16px; border:1px solid #449d9f; border-radius:8px; background:#fff; color:#2f373c; font-family:Roboto,Arial,sans-serif; font-size:14px; font-weight:400; line-height:22px; box-shadow:none; transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
+    #form select { padding-right:40px; }
+    input:focus,select:focus { border-color:rgba(68,157,159,.95); box-shadow:0 0 0 3px rgba(68,157,159,.12); outline:none; }
+    .validations { gap:6px; border:0; }
+    .validation { position:relative; display:grid; grid-template-columns:1fr auto; border:1px solid transparent; border-radius:10px; padding:6px 8px; min-height:48px; }
+    .validation::before { display:none; }
+    .validation.pass { border:1px solid #00864f; background:#e5fff5; }
+    .validation.pass::before { content:'✓'; background:#00864f; }
+    .validation.fail { border:1px solid #d32f2f; background:#fff0f0; }
+    .validation.fail::before { content:'×'; background:#d32f2f; }
+    .validation span { color:#007f4b; font-size:11px; line-height:16px; }
+    .validation.fail span { color:#b42318; }
+    .validation strong { color:#007f4b; font-size:13px; line-height:16px; }
+    .validation.fail strong { color:#b42318; }
   </style>
 </head>
 <body>
 <main>
   <section class="grid">
     <form class="panel" id="form">
-      <div class="inputs">
-        <section class="requirements"><h2>Requirements</h2><div class="requirements-fields"><label class="primary-requirement"><span class="material-symbols-outlined">scale</span>Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label><label class="primary-requirement"><span class="material-symbols-outlined">speed</span>Speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label><label><span class="material-symbols-outlined">swap_vert</span>Actuator Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option></select></label><label><span class="material-symbols-outlined">view_in_ar</span>Plate orientation<select id="plateDirection"><option value="vertical">Radial (Vertical)</option><option value="horizontal">Axial (Horizontal)</option></select></label></div></section>
-        <label class="span-3">Actuator<select id="actuator"></select><span class="hint" id="actuatorHint"></span></label>
-        <label class="span-3">Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label>
-        <div class="setting-groups">
-          <section class="setting-group"><h3>Actuator settings</h3><label><span class="material-symbols-outlined">settings</span>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label><label><span class="material-symbols-outlined">straighten</span>Length (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label><label><span class="material-symbols-outlined">speed</span>Accel. (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label><label><span class="material-symbols-outlined">verified</span>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label></section>
-        </div>
-      </div>
+      <section class="form-section actuator-section"><h2>Actuator Settings</h2><div class="inputs"><label class="span-3">Actuator<select id="actuator"></select><span class="hint" id="actuatorHint"></span></label><label class="span-3">Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label><div class="setting-groups"><section class="setting-group"><label>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label><label>Length (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label><label>Accel. (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label><label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label></section></div></div>
       <details><summary>More configuration</summary><div class="inputs">
         <label id="railWidthField">Axial rail width (mm)<select id="railWidth"></select></label>
         <label>Payload offset (mm)<input id="offset" type="number" min="0" max="1000" step="1" value="0"></label>
         <label>Microstepping<input id="microsteps" type="number" min="1" max="32" step="1" value="16"></label>
         <label>Driver current (A)<input id="current" type="number" min="0.1" max="1.4" step="0.1" value="1.4"></label>
-      </div><p class="hint">Assumes a 24 V TB67S109-class constant-current driver at 1.4 A and 16× microstepping. Firmware settings are not treated as hard limits.</p></details>
+      </div><p class="hint">Assumes a 24 V TB67S109-class constant-current driver at 1.4 A and 16× microstepping. Firmware settings are not treated as hard limits.</p></details></section>
+      <section class="form-section requirements"><h2>Requirements</h2><div class="requirements-fields"><label class="primary-requirement">Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label><label class="primary-requirement">Speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label><label>Actuator Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option></select></label><label id="plateDirectionField">Gantry Plate Orientation<select id="plateDirection"><option value="vertical">Vertical Gantry</option><option value="horizontal">Horizontal Gantry</option></select></label></div></section>
     </form>
     <section class="panel" id="resultPanel">
       <h2>Results</h2>
@@ -74,14 +89,14 @@
         <div class="metric"><span>Suggested max accel</span><strong id="maxAccel">—</strong></div>
         <div class="metric"><span>Gantry moment</span><strong id="moment">—</strong></div>
       </div>
-    </section>
-    <section class="panel chart" id="capabilitiesCard">
+      <section class="chart" id="capabilitiesCard">
       <div class="capability-charts">
         <div><h3>Speed Log</h3><div class="legend"><span><i class="key"></i>Achievable profile</span><span><i class="key red"></i>Requested profile</span><span id="accelDistance">Acceleration: —</span></div><div class="chartbox"><svg id="profile" role="img" aria-label="Speed log over travel"></svg></div><p class="hint" id="profileNote"></p></div>
         <div><h3>Speed vs Payload Log</h3><div class="legend"><span><i class="key"></i>Maximum Payload at Speed</span><span><i class="key red"></i>Maximum Speed with Payload</span></div><div class="chartbox"><svg id="loadCurve" role="img" aria-label="Speed versus payload log"></svg></div></div>
       </div>
-      <p class="hint">Blue is maximum payload with the selected safety factor. The red line is the requested payload; its intersection with blue is the design stall point.</p>
-      <aside class="notice"><strong>Beam deflection is not checked.</strong> This result covers the selected drive and gantry plate only; confirm extrusion span, mounting, end supports and payload position separately. &gt; <a href="https://files.plytix.com/api/v1.1/file/public_files/pim/assets/8f/b1/02/66/6602b18f974b5800018ecc4d/texts/54/63/29/6a/6a2963545e87993209eff7bf/Ooznest%20Aluminium%20Extrusion%20Load%20and%20Deflections.pdf" target="_blank" rel="noopener">Check this link for information on beam deflections</a></aside>
+      <p class="hint">Dark teal is maximum payload with the selected safety factor. The orange line is the requested payload; its intersection with blue is the design stall point.</p>
+      <aside class="notice">Results are a guide only and provide a theoretical evaluation of max speed, motor torque, and gantry/moment loads. Beam deflection is not calculated. Please verify your design with independent calculations. Beam deflections can be found <a href="https://files.plytix.com/api/v1.1/file/public_files/pim/assets/8f/b1/02/66/6602b18f974b5800018ecc4d/texts/54/63/29/6a/6a2963545e87993209eff7bf/Ooznest%20Aluminium%20Extrusion%20Load%20and%20Deflections.pdf" target="_blank" rel="noopener">here</a>.</aside>
+      </section>
     </section>
     <div class="detail"><strong>What is limiting it?</strong><div id="limiter"></div><dl id="details"></dl></div>
   </section>
