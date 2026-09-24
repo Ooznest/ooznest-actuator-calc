@@ -1,14 +1,14 @@
 [
-  {"id":"nema17-21-140","name":"NEMA17 · 21 oz-in · 1.4 A","torque":1.5,"current":1.4,"resistance":1.9,"inductance":2,"voltage":2.66,"steps":200},
+  {"id":"nema17-21-140","name":"NEMA17 · 21 oz-in · 1.4 A · 1.8°","torque":1.5,"current":1.4,"resistance":1.9,"inductance":2,"voltage":2.66,"steps":200},
   {"id":"nema17-35-133-09","name":"NEMA17 · 35 oz-in · 1.33 A · 0.9°","torque":2.5,"current":1.33,"resistance":2.1,"inductance":2.5,"voltage":2.793,"steps":400},
-  {"id":"nema17-44-133","name":"NEMA17 · 44 oz-in · 1.33 A","torque":3.2,"current":1.33,"resistance":2.1,"inductance":2.5,"voltage":2.793,"steps":200},
+  {"id":"nema17-44-133","name":"NEMA17 · 44 oz-in · 1.33 A · 1.8°","torque":3.2,"current":1.33,"resistance":2.1,"inductance":2.5,"voltage":2.793,"steps":200},
   {"id":"nema17-50-168-09","name":"NEMA17 · 50 oz-in · 1.68 A · 0.9°","torque":3.5,"current":1.68,"resistance":1.65,"inductance":3.5,"voltage":2.772,"steps":400},
   {"id":"nema17-62-168-09","name":"NEMA17 · 61.5 oz-in · 1.68 A · 0.9°","torque":4.4,"current":1.68,"resistance":1.65,"inductance":2.8,"voltage":2.772,"steps":400},
-  {"id":"nema17-62-168","name":"NEMA17 · 62 oz-in · 1.68 A","torque":4.4,"current":1.68,"resistance":1.65,"inductance":3.6,"voltage":2.772,"steps":200},
-  {"id":"nema17-77-168","name":"NEMA17 · 77 oz-in · 1.68 A","torque":5.5,"current":1.68,"resistance":1.65,"inductance":2.8,"voltage":2.772,"steps":200},
-  {"id":"nema17-114-200","name":"NEMA17 · 114 oz-in · 2.0 A","torque":8.2,"current":2,"resistance":2,"inductance":3.3,"voltage":4,"steps":200},
-  {"id":"nema23-175-200","name":"NEMA23 · 175 oz-in · 2.0 A","torque":12.6,"current":2,"resistance":1.4,"inductance":5.1,"voltage":2.8,"steps":200},
-  {"id":"nema23-175-280","name":"NEMA23 · 175 oz-in · 2.8 A","torque":12.6,"current":2.8,"resistance":1.1,"inductance":3,"voltage":3.08,"steps":200},
-  {"id":"nema23-265-280","name":"NEMA23 · 265 oz-in · 2.8 A","torque":19.1,"current":2.8,"resistance":1.13,"inductance":7.6,"voltage":3.164,"steps":200},
-  {"id":"nema23-345-300","name":"NEMA23 · 345 oz-in · 3.0 A","torque":24.5,"current":3,"resistance":1.2,"inductance":4,"voltage":3.6,"steps":200}
+  {"id":"nema17-62-168","name":"NEMA17 · 62 oz-in · 1.68 A · 1.8°","torque":4.4,"current":1.68,"resistance":1.65,"inductance":3.6,"voltage":2.772,"steps":200},
+  {"id":"nema17-77-168","name":"NEMA17 · 77 oz-in · 1.68 A · 1.8°","torque":5.5,"current":1.68,"resistance":1.65,"inductance":2.8,"voltage":2.772,"steps":200},
+  {"id":"nema17-114-200","name":"NEMA17 · 114 oz-in · 2.0 A · 1.8°","torque":8.2,"current":2,"resistance":2,"inductance":3.3,"voltage":4,"steps":200},
+  {"id":"nema23-175-200","name":"NEMA23 · 175 oz-in · 2.0 A · 1.8°","torque":12.6,"current":2,"resistance":1.4,"inductance":5.1,"voltage":2.8,"steps":200},
+  {"id":"nema23-175-280","name":"NEMA23 · 175 oz-in · 2.8 A · 1.8°","torque":12.6,"current":2.8,"resistance":1.1,"inductance":3,"voltage":3.08,"steps":200},
+  {"id":"nema23-265-280","name":"NEMA23 · 265 oz-in · 2.8 A · 1.8°","torque":19.1,"current":2.8,"resistance":1.13,"inductance":7.6,"voltage":3.164,"steps":200},
+  {"id":"nema23-345-300","name":"NEMA23 · 345 oz-in · 3.0 A · 1.8°","torque":24.5,"current":3,"resistance":1.2,"inductance":4,"voltage":3.6,"steps":200}
 ]

@@ -23,28 +23,30 @@
     #resultPanel h2 { margin:0 0 3px; color:var(--primary); font-size:14px; line-height:20px; }
     #form.panel { border:0; padding:0; background:transparent; box-shadow:none; }
     .setting-groups { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px 12px; }
-    .setting-group { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:3px 6px; }
+    .setting-group { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px 6px; }
     .setting-group:first-child { grid-column:1/-1; }
     .setting-group h3 { grid-column:1/-1; margin:0; color:var(--ink); font-size:11px; font-weight:500; }
     .requirements { grid-column:1/-1; border-bottom:1px solid var(--line); padding-bottom:6px; margin-bottom:2px; }
     .requirements h2 { margin:0 0 3px; font-size:14px; line-height:20px; color:var(--primary); }
     .requirements-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 6px; }
+    .requirements-fields .orientation-fields { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px 6px; }
+    .requirements-fields .orientation-fields.compact { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .requirements .primary-requirement { color:var(--ink); font-weight:700; }
     .requirements .primary-requirement input { background:#ebefef; border-color:#449d9f; }
 
 
     @media (min-width:600px) { #form details .inputs { grid-template-columns:repeat(3,minmax(0,1fr)); } #form .setting-group h3 { font-size:10px; } }
-    @media (max-width:520px) { .setting-groups,.setting-group { grid-template-columns:1fr; } }
+    @media (max-width:520px) { .setting-groups,.setting-group,.requirements-fields,.requirements-fields .orientation-fields { grid-template-columns:1fr; } }
     .form-section { border:1px solid var(--line); border-radius:8px; padding:8px; margin-bottom:8px; background:#fff; }
-    .form-section h2 { margin:0 0 6px; color:var(--primary); font-size:14px; line-height:20px; }
+    .form-section h2 { margin:0 0 6px; color:var(--primary); font-size:14px; line-height:20px; font-weight:700; }
     .actuator-section .inputs { gap:6px 12px; }
     .actuator-section .setting-groups { margin-top:2px; }
     /* Match the shared Ooznest form controls. */
-    #form label { color:#449d9f; font-size:12px; font-weight:600; line-height:20px; }
-    #form input,#form select { min-height:40px; height:40px; padding:8px 16px; border:1px solid #449d9f; border-radius:8px; background:#fff; color:#2f373c; font-family:Roboto,Arial,sans-serif; font-size:14px; font-weight:400; line-height:22px; box-shadow:none; transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
-    #form select { padding-right:40px; }
+    #form label { display:block; color:#449d9f; font-size:11px; font-weight:700; line-height:14px; letter-spacing:0; }
+    #form input,#form select { min-height:32px; height:32px; padding:0 10px; border:1px solid rgba(68,157,159,.24); border-radius:8px; background:#fff; color:#004c5b; font-family:Nunito,Inter,Arial,sans-serif; font-size:12px; font-weight:800; line-height:30px; box-shadow:none; transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
+    #form select { appearance:none; -webkit-appearance:none; padding-right:28px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23004c5b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:calc(100% - 10px) 50%; background-size:16px 16px; }
     input:focus,select:focus { border-color:rgba(68,157,159,.95); box-shadow:0 0 0 3px rgba(68,157,159,.12); outline:none; }
-    .validations { gap:6px; border:0; }
+    .validations { gap:6px; border:0; margin:7px 0 16px; }
     .validation { position:relative; display:grid; grid-template-columns:1fr auto; border:1px solid transparent; border-radius:10px; padding:6px 8px; min-height:48px; }
     .validation::before { display:none; }
     .validation.pass { border:1px solid #00864f; background:#e5fff5; }
@@ -52,6 +54,7 @@
     .validation.fail { border:1px solid #d32f2f; background:#fff0f0; }
     .validation.fail::before { content:'×'; background:#d32f2f; }
     .validation span { color:#007f4b; font-size:11px; line-height:16px; }
+    .validation small { grid-column:1/-1; display:block; white-space:nowrap; font-size:11px; line-height:16px; }
     .validation.fail span { color:#b42318; }
     .validation strong { color:#007f4b; font-size:13px; line-height:16px; }
     .validation.fail strong { color:#b42318; }
@@ -61,14 +64,14 @@
 <main>
   <section class="grid">
     <form class="panel" id="form">
-      <section class="form-section actuator-section"><h2>Actuator Settings</h2><div class="inputs"><label class="span-3">Actuator<select id="actuator"></select><span class="hint" id="actuatorHint"></span></label><label class="span-3">Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label><div class="setting-groups"><section class="setting-group"><label>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label><label>Length (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label><label>Accel. (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label><label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label></section></div></div>
+      <section class="form-section actuator-section"><h2>Actuator Settings</h2><div class="inputs"><label class="span-3">Actuator<select id="actuator"></select><span class="hint" id="actuatorHint"></span></label><label class="span-3">Gantry plate<select id="gantry"></select><span class="hint" id="gantryHint"></span></label><div class="setting-groups"><section class="setting-group"><label>Motor<select id="motor"></select><span class="hint" id="motorHint"></span></label><label>Length (mm)<input id="travel" type="number" min="50" max="3000" step="1" value="500"></label><label>Accel. (mm/s²)<input id="accel" type="number" min="1" max="2000" step="1" value="100"></label></section></div></div>
       <details><summary>More configuration</summary><div class="inputs">
-        <label id="railWidthField">Axial rail width (mm)<select id="railWidth"></select></label>
+        <label id="railWidthField" hidden>Axial rail width (mm)<select id="railWidth"></select></label>
         <label>Payload offset (mm)<input id="offset" type="number" min="0" max="1000" step="1" value="0"></label>
         <label>Microstepping<input id="microsteps" type="number" min="1" max="32" step="1" value="16"></label>
         <label>Driver current (A)<input id="current" type="number" min="0.1" max="1.4" step="0.1" value="1.4"></label>
       </div><p class="hint">Assumes a 24 V TB67S109-class constant-current driver at 1.4 A and 16× microstepping. Firmware settings are not treated as hard limits.</p></details></section>
-      <section class="form-section requirements"><h2>Requirements</h2><div class="requirements-fields"><label class="primary-requirement">Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label><label class="primary-requirement">Speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label><label>Actuator Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option></select></label><label id="plateDirectionField">Gantry Plate Orientation<select id="plateDirection"><option value="vertical">Vertical Gantry</option><option value="horizontal">Horizontal Gantry</option></select></label></div></section>
+      <section class="form-section requirements"><h2>Requirements</h2><div class="requirements-fields"><label class="primary-requirement">Payload (kg)<input id="load" type="number" min="0" max="100" step="0.1" value="10"></label><label class="primary-requirement">Speed (mm/min)<input id="speed" type="number" min="1" max="10000" step="10" value="1200"></label><div class="orientation-fields"><label>Actuator Orientation<select id="orientation"><option value="vertical">Vertical lift</option><option value="horizontal">Horizontal</option></select></label><label id="plateDirectionField">Gantry Plate Orientation<select id="plateDirection"><option value="vertical">Vertical Gantry</option><option value="horizontal">Horizontal Gantry</option></select></label><label>Factor of safety<input id="fos" type="number" min="1" max="5" step="0.1" value="2"></label></div></div></section>
     </form>
     <section class="panel" id="resultPanel">
       <h2>Results</h2>
@@ -102,6 +105,78 @@
   </section>
   <p class="hint"><code>?actuator=cbeam-screw&amp;travel=500&amp;motor=nema23-345-300&amp;orientation=vertical&amp;load=10&amp;speed=1200&amp;fos=2</code></p>
 </main>
-<script src="index.js?v=20260921.5"></script>
+<script src="index.js?v=20260924.20"></script>
+<script>
+(() => {
+  const actuator = document.getElementById('actuator');
+  const motor = document.getElementById('motor');
+  const railWidth = document.getElementById('railWidth');
+  const railWidthField = document.getElementById('railWidthField');
+  const gantry = document.getElementById('gantry');
+  const plate = document.getElementById('plateDirectionField');
+  const orientationFields = document.querySelector('.orientation-fields');
+  let allMotorOptions = [];
+  function forceRailWidth() {
+    if (railWidthField) railWidthField.hidden = true;
+    if (railWidth && [...railWidth.options].some(option => option.value === '20')) {
+      railWidth.value = '20';
+      railWidth.dispatchEvent(new Event('change', {bubbles:true}));
+    }
+  }
+  gantry?.addEventListener('change', forceRailWidth);
+  new MutationObserver(() => { if (railWidthField && !railWidthField.hidden) railWidthField.hidden = true; }).observe(railWidthField, {attributes:true, attributeFilter:['hidden']});
+  forceRailWidth();
+  fetch('motors.json').then(response => response.json()).then(motors => {
+    allMotorOptions = motors.map(motor => ({value: motor.id, text: motor.name}));
+    refineMotorOptions();
+  });
+  function refineMotorOptions() {
+    if (!actuator || !motor) return;
+    if (!allMotorOptions.length) {
+      allMotorOptions = [...motor.options].map(option => ({value: option.value, text: option.textContent}));
+    }
+    const id = actuator.value;
+    const allowed = id === 'belt-gt2-30t' ? option => /^nema17-/.test(option.value)
+      : ['cbeam-screw', 'cbeam-rear-screw', 'nema17-screw', 'nema17-rear-screw'].includes(id) ? option => /^nema23-/.test(option.value)
+      : () => true;
+    const selected = motor.value;
+    motor.replaceChildren(...allMotorOptions.filter(allowed).map(option => {
+      const angle = option.value.endsWith('-09') ? '0.9°' : '1.8°';
+      const text = /\d\.\d°/.test(option.text) ? option.text : `${option.text} · ${angle}`;
+      return new Option(text, option.value);
+    }));
+    motor.value = allMotorOptions.some(option => option.value === selected && allowed(option)) ? selected : motor.options[0]?.value;
+  }
+  function resizeOrientationRow() {
+    orientationFields?.classList.toggle('compact', !!plate?.hidden);
+  }
+  actuator?.addEventListener('change', () => { refineMotorOptions(); resizeOrientationRow(); setTimeout(refineMotorOptions, 0); });
+  document.getElementById('orientation')?.addEventListener('change', resizeOrientationRow);
+  new MutationObserver(resizeOrientationRow).observe(plate, {attributes:true, attributeFilter:['hidden']});
+  refineMotorOptions();
+  resizeOrientationRow();
+  const results = document.getElementById('resultPanel');
+  function cleanResults() {
+    const moment = document.querySelector('#checkMoment small');
+    const speed = document.querySelector('#checkSpeed small');
+    if (moment && moment.innerHTML.includes('rating / user FOS')) {
+      moment.innerHTML = moment.innerHTML.replace(/\s*rating \/ user FOS/g, '');
+    }
+    if (speed && speed.innerHTML.includes('Requested:')) {
+      speed.innerHTML = speed.innerHTML.replace('Requested:', 'Max:');
+    }
+  }
+  cleanResults();
+  new MutationObserver(cleanResults).observe(results, {childList:true, subtree:true});
+  const profile = document.getElementById('profile');
+  new MutationObserver(() => {
+    const accel = document.getElementById('accelDistance');
+    if (accel?.textContent.startsWith('Acceleration:')) accel.textContent = accel.textContent.replace('Acceleration:', 'Accel Distance:');
+    const lines = [...profile.querySelectorAll('polyline')];
+    const requested = lines.find(line => line.getAttribute('stroke') === '#FF6600');
+    if (requested && profile.lastElementChild !== requested) profile.append(requested);
+  }).observe(profile, {childList:true, subtree:true});
+})();
+</script>
 </body>
 </html>
