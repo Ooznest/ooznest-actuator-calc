@@ -54,7 +54,7 @@
     if(requestedV<=0) return;
     const width=Number(svg.viewBox.baseVal.width)||360, left=42, right=width-12, top=28, bottom=160;
     const peak=Math.max(requestedV,1), X=x=>left+x/distance*(right-left), Y=y=>bottom-y/peak*(bottom-top), ramp=requestedV*requestedV/(2*accel);
-    const points=ramp>=distance?[[0,0],[ramp,requestedV]]:[[0,0],[ramp,requestedV],[ramp+(distance-2*ramp),requestedV],[distance,0]];
+    const points=ramp>=distance?[[0,requestedV],[distance,requestedV]]:[[0,0],[ramp,requestedV],[ramp+(distance-2*ramp),requestedV],[distance,0]];
     const line=document.createElementNS('http://www.w3.org/2000/svg','polyline');
     line.setAttribute('points',points.map(point=>`${X(point[0])},${Y(point[1])}`).join(' '));
     line.setAttribute('fill','none'); line.setAttribute('stroke','#FF6600'); line.setAttribute('stroke-width','2'); line.setAttribute('stroke-dasharray','5 3');

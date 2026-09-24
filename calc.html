@@ -20,7 +20,7 @@
     .chart { grid-column:1/-1; } .chartbox { height:185px; background:#fff; border:1px solid var(--line); padding:8px; } .capability-charts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } svg { width:100%; height:100%; overflow:visible; } .legend { display:flex; gap:12px; font-size:11px; color:var(--muted); flex-wrap:wrap; } .key { width:10px; height:10px; display:inline-block; margin-right:4px; background:var(--primary); } .key.gray { background:#757575; } .key.dashed { background:linear-gradient(90deg,#757575 55%,transparent 55%); } .key.red { background:#FF6600; }
     .notice { margin-top:12px; border:2px solid #FFC43A; border-radius:8px; background:#FFF3D8; padding:9px 12px; font-size:11px; } details { margin-top:6px; padding-top:0; } summary { cursor:pointer; color:var(--ink); font-size:13px; font-weight:500; } code { background:#f5f5f5; padding:2px 4px; } @media(max-width:520px){ main{max-width:760px;padding:10px}.results,.validations{grid-template-columns:1fr 1fr}.inputs,.capability-charts{grid-template-columns:1fr}.full{grid-column:auto} } @media(min-width:521px){ .capability-charts .chartbox{height:130px} } @media(min-width:600px){ main{padding:5px} #form .inputs{grid-template-columns:repeat(4,minmax(0,1fr));gap:3px 6px} #form .full{grid-column:1/-1} #form .hint{display:none} #form input,#form select{height:27px;padding:3px 6px;font-size:12px} #form label{font-size:9px} #form details{margin-top:5px;padding-top:4px} #capabilitiesCard .capability-charts{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px} #capabilitiesCard .chartbox{height:92px;padding:4px} #capabilitiesCard h2{font-size:15px;line-height:20px;margin:5px 0 3px} #capabilitiesCard h3{font-size:11px;margin:0 0 2px} #capabilitiesCard .legend{font-size:9px} #resultPanel .status{margin:3px 0;padding:3px 6px;font-size:10px} #resultPanel .validations{margin-bottom:3px} #resultPanel .results{display:none} }
     @media (min-width:600px) { .detail { display:none; } #capabilitiesCard > p.hint, #profileNote, main > p.hint { display:none; } #capabilitiesCard .chartbox { height:165px; } #form .inputs { grid-template-columns:repeat(6,minmax(0,1fr)); } #form .span-3 { grid-column:span 3; } #resultPanel .status { display:none; } }
-    #resultPanel h2 { margin:0 0 3px; color:var(--primary); font-size:14px; line-height:20px; }
+    #resultPanel h2 { margin:0 0 3px; color:var(--primary); font-size:14px; line-height:20px; font-weight:700; }
     #form.panel { border:0; padding:0; background:transparent; box-shadow:none; }
     .setting-groups { grid-column:1/-1; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px 12px; }
     .setting-group { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px 6px; }
@@ -28,7 +28,7 @@
     .setting-group h3 { grid-column:1/-1; margin:0; color:var(--ink); font-size:11px; font-weight:500; }
     .requirements { grid-column:1/-1; border-bottom:1px solid var(--line); padding-bottom:6px; margin-bottom:2px; }
     .requirements h2 { margin:0 0 3px; font-size:14px; line-height:20px; color:var(--primary); }
-    .requirements-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:3px 6px; }
+    .requirements-fields { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:13px 6px; }
     .requirements-fields .orientation-fields { grid-column:1/-1; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:3px 6px; }
     .requirements-fields .orientation-fields.compact { grid-template-columns:repeat(2,minmax(0,1fr)); }
     .requirements .primary-requirement { color:var(--ink); font-weight:700; }
@@ -39,14 +39,16 @@
     @media (max-width:520px) { .setting-groups,.setting-group,.requirements-fields,.requirements-fields .orientation-fields { grid-template-columns:1fr; } }
     .form-section { border:1px solid var(--line); border-radius:8px; padding:8px; margin-bottom:8px; background:#fff; }
     .form-section h2 { margin:0 0 6px; color:var(--primary); font-size:14px; line-height:20px; font-weight:700; }
-    .actuator-section .inputs { gap:6px 12px; }
-    .actuator-section .setting-groups { margin-top:2px; }
+    .actuator-section .inputs { gap:14px 12px; }
+    .actuator-section .setting-groups { margin-top:8px; }
     /* Match the shared Ooznest form controls. */
-    #form label { display:block; color:#449d9f; font-size:11px; font-weight:700; line-height:14px; letter-spacing:0; }
+    #form label { display:block; color:#449d9f; font-size:13px; font-weight:500; line-height:16px; letter-spacing:0; }
     #form input,#form select { min-height:32px; height:32px; padding:0 10px; border:1px solid rgba(68,157,159,.24); border-radius:8px; background:#fff; color:#004c5b; font-family:Nunito,Inter,Arial,sans-serif; font-size:12px; font-weight:800; line-height:30px; box-shadow:none; transition:border-color .18s ease,box-shadow .18s ease,background-color .18s ease; }
     #form select { appearance:none; -webkit-appearance:none; padding-right:28px; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'%3E%3Cpath d='M4 6l4 4 4-4' fill='none' stroke='%23004c5b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:calc(100% - 10px) 50%; background-size:16px 16px; }
     input:focus,select:focus { border-color:rgba(68,157,159,.95); box-shadow:0 0 0 3px rgba(68,157,159,.12); outline:none; }
-    .validations { gap:6px; border:0; margin:7px 0 16px; }
+    .validations { gap:6px; border:0; margin:7px 0 30px; }
+    .notice { margin-top:16px; }
+    #capabilitiesCard { margin-top:16px; }
     .validation { position:relative; display:grid; grid-template-columns:1fr auto; border:1px solid transparent; border-radius:10px; padding:6px 8px; min-height:48px; }
     .validation::before { display:none; }
     .validation.pass { border:1px solid #00864f; background:#e5fff5; }
@@ -105,7 +107,7 @@
   </section>
   <p class="hint"><code>?actuator=cbeam-screw&amp;travel=500&amp;motor=nema23-345-300&amp;orientation=vertical&amp;load=10&amp;speed=1200&amp;fos=2</code></p>
 </main>
-<script src="index.js?v=20260924.20"></script>
+<script src="index.js?v=20260924.22"></script>
 <script>
 (() => {
   const actuator = document.getElementById('actuator');
@@ -164,6 +166,13 @@
     }
     if (speed && speed.innerHTML.includes('Requested:')) {
       speed.innerHTML = speed.innerHTML.replace('Requested:', 'Max:');
+    }
+    if (speed && speed.innerHTML.startsWith('Max:') && !/^Max: [^<]+ mm\/min/.test(speed.innerHTML)) {
+      speed.innerHTML = speed.innerHTML.replace(/Max: ([\d,.-]+)(<br>)/, 'Max: $1 mm/min$2');
+    }
+    if (moment && moment.innerHTML.startsWith('Required:')) {
+      const required = moment.innerHTML.match(/^Required: ([\d,.-]+)(<br>)/);
+      if (required) moment.innerHTML = moment.innerHTML.replace(required[0], `Required: ${required[1]} Nm${required[2]}`);
     }
   }
   cleanResults();
