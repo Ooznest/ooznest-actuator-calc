@@ -1,5 +1,5 @@
 (async () => {
-  const cacheVersion = '20260925.38';
+  const cacheVersion = '20260925.45';
   const [motors, actuators, gantries, skuSource] = await Promise.all(['motors.json','transmission.json','gantryplates.json','sku-source.json'].map(file => fetch(`${file}?v=${cacheVersion}`, {cache:'no-store'}).then(response => {
     if (!response.ok) throw new Error(`Unable to load ${file}`);
     return response.json();
@@ -16,7 +16,7 @@
     if (prefix === 'CBSDA') return {status:'supported', params:{actuator:'cbeam-screw', motor:'nema23-175-280', gantry:`cbeam-${plate}`, travel:Number(parts[1]), railWidth:80, plateDirection:'vertical'}};
     if (prefix === 'SDA') return {status:'supported', params:{actuator:parts[1] === 'NEMA17' ? 'nema17-screw' : 'nema23-screw', motor:parts[1] === 'NEMA17' ? 'nema17-62-168' : 'nema23-175-280', gantry:`vslot-${plate}`, travel:Number(parts[3]), railWidth:Number(parts[2].slice(2)), plateDirection:'vertical'}};
     if (prefix === 'BDA') return {status:'supported', params:{actuator:'belt-gt2-30t', motor:parts[1] === 'NEMA17' ? 'nema17-62-168' : 'nema23-175-280', gantry:`vslot-${plate}`, travel:Number(parts[3]), railWidth:Number(parts[2].slice(2)), plateDirection:'vertical'}};
-    if (prefix === 'MBDA') return {status:'supported', params:{actuator:'belt-gt3-20t', motor:'nema23-175-280', gantry:`vslot-${plate}`, travel:Number(parts[2]), railWidth:Number(parts[1].slice(2)), plateDirection:'vertical'}};
+    if (prefix === 'MBDA') return {status:'supported', params:{actuator:'belt-gt3-20t', motor:'nema17-62-168', gantry:`vslot-${plate}`, travel:Number(parts[2]), railWidth:Number(parts[1].slice(2)), plateDirection:'vertical'}};
     return undefined;
   })());
   if (sku && !skuRecord) throw new Error(`Unknown calculator SKU: ${sku}`);
@@ -24,8 +24,8 @@
   if (sku && skuRecord?.status !== 'supported') throw new Error(`${sku}: ${skuRecord?.reason || 'This SKU is not a calculator product.'}`);
   ['actuator','motor','gantry','travel','orientation','load','offset','speed','accel','microsteps','current','fos','plateDirection','railWidth'].forEach(key => { if (params.has(key)) $(key).value = params.get(key); });
   if (skuRecord) {
-    const skuMotor = sku.includes('-NEMA17-') ? 'nema17-62-168' : 'nema23-175-280';
-    Object.entries({ ...skuRecord.params, motor: skuMotor }).forEach(([key, value]) => { $(key).value = value; });
+    const skuMotor = sku.startsWith('MBDA-') || sku.includes('-NEMA17-') ? 'nema17-62-168' : 'nema23-175-280';
+    Object.entries({ ...skuRecord.params, actuator: sku.startsWith('MBDA-') ? 'belt-gt3-20t' : skuRecord.params.actuator, motor: skuMotor }).forEach(([key, value]) => { $(key).value = value; });
   }
   if (skuDefaults) { if (!params.has('load')) $('load').value = skuDefaults.load; if (!params.has('speed')) $('speed').value = skuDefaults.speed; }
   if (!['vertical','horizontal'].includes($('orientation').value)) $('orientation').value = 'vertical';
@@ -34,7 +34,7 @@
   const isCBeamActuator = actuator => ['cbeam-screw','cbeam-rear-screw'].includes(actuator.id);
   const setOptions = (id, items, preferred) => { const current=$(id).value; $(id).innerHTML=items.map(item=>`<option value="${item.id}">${item.name}</option>`).join(''); $(id).value=items.some(item=>item.id===current)?current:(items.some(item=>item.id===preferred)?preferred:items[0].id); };
   function syncGantryOptions(){const gantry=gantries.find(item=>item.id===$('gantry').value), widths=Object.keys(gantry.actual.axialStaticNByRailMm).map(Number).sort((a,b)=>a-b), selected=Number($('railWidth').value);$('railWidth').innerHTML=widths.map(width=>`<option value="${width}">${width}</option>`).join('');$('railWidth').value=widths.includes(selected)?String(selected):String(widths[0]);return widths;}
-  function syncCompatibility(){const actuator=actuators.find(item=>item.id===$('actuator').value), cbeam=isCBeamActuator(actuator), gantryOptions=gantries.filter(item=>cbeam?item.id.startsWith('cbeam-'):item.id.startsWith('vslot-')), motorOptions=motors.filter(item=>cbeam?item.id.startsWith('nema23-'):/^nema(17|23)-/.test(item.id)); setOptions('gantry',gantryOptions,cbeam?'cbeam-large':(actuator.id==='belt-gt2-30t'?'vslot-large':'vslot-large')); setOptions('motor',motorOptions,cbeam?'nema23-175-280':(actuator.id==='belt-gt2-30t'?'nema17-62-168':'nema23-175-280')); return syncGantryOptions();}
+  function syncCompatibility(){const actuator=actuators.find(item=>item.id===$('actuator').value), cbeam=isCBeamActuator(actuator), modular=$('actuator').value==='belt-gt3-20t', gantryOptions=gantries.filter(item=>cbeam?item.id.startsWith('cbeam-'):item.id.startsWith('vslot-')), motorOptions=motors.filter(item=>cbeam?item.id.startsWith('nema23-'):modular?item.id.startsWith('nema17-'):/^nema(17|23)-/.test(item.id)); setOptions('gantry',gantryOptions,cbeam?'cbeam-large':'vslot-large'); setOptions('motor',motorOptions,cbeam?'nema23-175-280':'nema17-62-168'); return syncGantryOptions();}
   const initialRailWidths=syncCompatibility();
   if (skuRecord) $('motor').value = sku.includes('-NEMA17-') ? 'nema17-62-168' : 'nema23-175-280';
   if(skuRecord?.params.railWidth && initialRailWidths.includes(Number(skuRecord.params.railWidth)))$('railWidth').value=String(skuRecord.params.railWidth);
@@ -64,6 +64,7 @@
     line.setAttribute('fill','none'); line.setAttribute('stroke','#FF6600'); line.setAttribute('stroke-width','2'); line.setAttribute('stroke-dasharray','5 3');
     svg.append(line);
   };
-  const baseUpdate=update; let skuDefaultsApplied=false; update=function(){if(skuRecord&&!skuDefaultsApplied&&!params.has('load')&&!params.has('speed')){const d=data(),safeLoad=Math.max(0,maxPayloadAtSpeed(d,0)*.8);if(d.load>safeLoad)$('load').value=String(Number(safeLoad.toFixed(1)));const adjusted=data(),limit=maxSpeed(adjusted);$('speed').value=String(Math.max(1,Math.floor(Math.min(adjusted.speed,limit*.75))));skuDefaultsApplied=true;}if(skuRecord)$('motor').value=sku.includes('-NEMA17-')?'nema17-62-168':'nema23-175-280';return baseUpdate();};
-  $('actuator').addEventListener('change',syncCompatibility); $('gantry').addEventListener('change',syncGantryOptions); $('form').addEventListener('input',update); $('form').addEventListener('change',update); update();
+  const baseUpdate=update; let skuDefaultsApplied=false, actuatorChanged=false, loadChanged=false, speedChanged=false;
+  update=function(){const shouldReset=skuRecord&&!skuDefaultsApplied||actuatorChanged;if(shouldReset){if(!loadChanged&&!params.has('load')){const d=data(),safeLoad=Math.max(0,maxPayloadAtSpeed(d,0)*.8);if(d.load>safeLoad)$('load').value=String(Number(safeLoad.toFixed(1)));}if(!speedChanged&&!params.has('speed')){const adjusted=data(),limit=maxSpeed(adjusted);$('speed').value=String(Math.max(1,Math.floor(Math.min(adjusted.speed,limit*.75))));}if(skuRecord&&sku.startsWith('MBDA-')){$('actuator').value='belt-gt3-20t';syncCompatibility();}const actuatorId=$('actuator').value,cbeam=isCBeamActuator(actuators.find(item=>item.id===actuatorId)),nema17Default=['belt-gt3-20t','belt-gt2-30t','nema17-screw','nema17-rear-screw'].includes(actuatorId);$('motor').value=cbeam?'nema23-175-280':nema17Default||skuRecord&&(sku.startsWith('MBDA-')||sku.includes('-NEMA17-'))?'nema17-62-168':'nema23-175-280';skuDefaultsApplied=true;actuatorChanged=false;}return baseUpdate();};
+  $('actuator').addEventListener('change',()=>{actuatorChanged=true;syncCompatibility();update();}); $('gantry').addEventListener('change',syncGantryOptions); $('form').addEventListener('input',event=>{if(event.target.id==='load')loadChanged=true;if(event.target.id==='speed')speedChanged=true;update();}); $('form').addEventListener('change',update); update();
 })().catch(error => { document.body.insertAdjacentHTML('afterbegin', `<p style="color:#b42318;padding:12px">Calculator data could not be loaded: ${error.message}</p>`); console.error(error); });
